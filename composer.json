@@ -1,0 +1,17 @@
+{
+    "name": "daferreira/compiler",
+    "authors": [
+        {
+            "name": "daferreira946",
+            "email": "daferreira1996@icloud.com"
+        }
+    ],
+    "require": {
+      "ext-json": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Compiler\\" : "./"
+        }
+    }
+}

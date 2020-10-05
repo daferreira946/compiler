@@ -1,0 +1,11 @@
+program testando;
+
+interger x;
+string testando;
+
+begin
+
+	testando := palavras;
+	x := 3 + 65;
+
+end

@@ -1,0 +1,56 @@
+{
+  "words" : [
+    "program",
+    "begin",
+    "end",
+    "if",
+    "then",
+    "else",
+    "while",
+    "do",
+    "until",
+    "repeat",
+    "all",
+    "string",
+    "integer",
+    "real"
+  ],
+  "booleans" : [
+    "and",
+    "or"
+  ],
+  "symbols" : {
+    "specials" : [
+      ".",
+      ",",
+      ";",
+      ")",
+      "(",
+      ":="
+    ],
+    "arithmetics" : [
+      "+",
+      "-",
+      "*",
+      "/"
+    ],
+    "relationals" : [
+      "<",
+      ">",
+      "<=",
+      ">=",
+      "=",
+      "<>"
+    ],
+    "comments" : [
+      "{",
+      "}"
+    ]
+  },
+  "variables" : {
+      "id" : "/^[a-zA-Z]+\\w*$/",
+      "integer" : "/^[0-9]+$/",
+      "real" : "/^[0-9]+.[0-9]+$/",
+      "string" : "^[a-zA-Z]+\\w*$"
+  }
+}
