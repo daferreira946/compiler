@@ -1,6 +1,6 @@
 program testando;
 
-interger x;
+integer x;
 string testando;
 
 begin

@@ -17,15 +17,23 @@ $file = '../uploads/algoritmo.txt';
 $lexic = new Lexic($config, $file);
 $parsed = $lexic->getContent();
 $token = $lexic->getTokenCodigo();
+
+if ($token === false) {
+    echo "Erro, <a href='../index.php'>clique aqui</a>  para voltar";
+}
+
 $lexic->lexicAnalyzer($token);
 
-if (!empty($lexic->getErrors())) {
+if ($lexic->getErrors() !== false) {
     $errors = $lexic->getErrors();
     echo $openPre . var_dump($errors) . $closePre;
     die();
 }
 
 $lexicTable = $lexic->getLexicTable();
+
+$lexicIterator = $lexic->getLexicIterator();
+$lexicIteratorIndex = $lexic->getLexicIteratorIndex();
 
 echo "<table style='border: black solid;padding: 10px'>";
 for ($i = 0; $i < count($lexicTable); $i++) {

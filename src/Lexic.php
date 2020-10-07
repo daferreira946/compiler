@@ -2,6 +2,9 @@
 
 namespace Compiler\src;
 
+use ArrayIterator;
+use ArrayObject;
+
 require '../vendor/autoload.php';
 
 class Lexic
@@ -22,16 +25,18 @@ class Lexic
     public function getTokenCodigo()
     {
         $pattern = '\' |;\'';
-        for ($i = 0; $i < count($this->trimmed); $i++) {
-            $token[$i] = preg_split($pattern, strtolower($this->trimmed[$i]));
-            if ($token[$i][count($token[$i])-1] == '') {
-                $token[$i][count($token[$i])-1] = ';';
+        for ($line = 0; $line < count($this->trimmed); $line++) {
+            $token[$line] = preg_split($pattern, strtolower($this->trimmed[$line]));
+            if ($token[$line][count($token[$line])-1] == '') {
+                $token[$line][count($token[$line])-1] = ';';
             }
         }
 
         if (!empty($token)) {
             return $token;
         }
+
+        return false;
     }
 
     public function getErrors()
@@ -39,45 +44,8 @@ class Lexic
         if (isset($this->errorMessage)) {
             return $this->errorMessage;
         }
-    }
 
-    public function lexicAnalyzer(array $tokens)
-    {
-        for ($i=0; $i < count($tokens); $i++) {
-            for ($a=0; $a < count($tokens[$i]); $a++) {
-                $token = $tokens[$i][$a];
-                $word = $this->word($token);
-                $bool = $this->bool($token);
-                $symbols = $this->symbols($token);
-                $variables = $this->variables($token);
-                $unknow = true;
-                if ($word !== false) {
-                    $this->lexicTable[$i][$a][$word] = $token;
-                    $bool = false;
-                    $symbols = false;
-                    $variables = false;
-                    $unknow = false;
-                }
-                if ($bool !== false) {
-                    $this->lexicTable[$i][$a][$bool] = $token;
-                    $symbols = false;
-                    $variables = false;
-                    $unknow = false;
-                }
-                if ($symbols !== false) {
-                    $this->lexicTable[$i][$a][$symbols] = $token;
-                    $variables = false;
-                    $unknow = false;
-                }
-                if ($variables !== false) {
-                    $this->lexicTable[$i][$a][$variables] = $token;
-                    $unknow = false;
-                }
-                if ($unknow) {
-                    $this->errorMessage[] = "Erro léxico = $token não reconhecido, na linha $i coluna $a";
-                }
-            }
-        }
+        return false;
     }
 
     public function getContent(): array
@@ -90,10 +58,76 @@ class Lexic
         return $this->lexicTable;
     }
 
+    public function getLexicIterator(): ArrayIterator
+    {
+        $lexicArrayObject = new ArrayObject();
+
+        for ($line = 0; $line < count($this->lexicTable); $line++) {
+            for ($column = 0; $column < count($this->lexicTable[$line]); $column++) {
+                $lexicArrayObject->append($this->lexicTable[$line][$column]);
+            }
+        }
+
+
+        return $lexicArrayObject->getIterator();
+    }
+
+    public function getLexicIteratorIndex(): ArrayIterator
+    {
+        $lexicIndexArrayObject = new ArrayObject();
+
+        for ($line = 0; $line < count($this->lexicTable); $line++) {
+            for ($column = 0; $column < count($this->lexicTable[$line]); $column++) {
+                $lexicIndexArrayObject->append("Linha: [$line] Coluna: [$column]");
+            }
+        }
+
+        return $lexicIndexArrayObject->getIterator();
+    }
+
     private function trimmed(): void
     {
         foreach ($this->parsed as $toTrim) {
             $this->trimmed[] = trim($toTrim, " \t\n\r\0\x0B");
+        }
+    }
+
+    public function lexicAnalyzer(array $tokens)
+    {
+        for ($line = 0; $line < count($tokens); $line++) {
+            for ($column = 0; $column < count($tokens[$line]); $column++) {
+                $token = $tokens[$line][$column];
+                $word = $this->word($token);
+                $bool = $this->bool($token);
+                $symbols = $this->symbols($token);
+                $variables = $this->variables($token);
+                $unknow = true;
+                if ($word !== false) {
+                    $this->lexicTable[$line][$column][$word] = $token;
+                    $bool = false;
+                    $symbols = false;
+                    $variables = false;
+                    $unknow = false;
+                }
+                if ($bool !== false) {
+                    $this->lexicTable[$line][$column][$bool] = $token;
+                    $symbols = false;
+                    $variables = false;
+                    $unknow = false;
+                }
+                if ($symbols !== false) {
+                    $this->lexicTable[$line][$column][$symbols] = $token;
+                    $variables = false;
+                    $unknow = false;
+                }
+                if ($variables !== false) {
+                    $this->lexicTable[$line][$column][$variables] = $token;
+                    $unknow = false;
+                }
+                if ($unknow) {
+                    $this->errorMessage[] = "Erro léxico = $token não reconhecido, na linha $line coluna $column";
+                }
+            }
         }
     }
 
