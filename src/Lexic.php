@@ -22,14 +22,30 @@ class Lexic
         $this->trimmed();
     }
 
-    public function getTokenCodigo()
+    public function getTokenCode()
     {
-        $pattern = '\' |;\'';
+        $pattern = '/ /';
         for ($line = 0; $line < count($this->trimmed); $line++) {
-            $token[$line] = preg_split($pattern, strtolower($this->trimmed[$line]));
-            if ($token[$line][count($token[$line])-1] == '') {
-                $token[$line][count($token[$line])-1] = ';';
+            $splitted = preg_split($pattern, strtolower($this->trimmed[$line]));
+            for ($line2 = 0; $line2 < count($splitted); $line2++) {
+                if ($splitted[$line2] === ':') {
+                    if ($splitted[$line2+1] === '=') {
+                        $splitted[$line2] = $splitted[$line2] . $splitted[$line2+1];
+                        unset($splitted[$line2+1]);
+                    }
+                }
+                if ($splitted[$line2] === '>' | $splitted[$line2] === '<') {
+                    if ($splitted[$line2+1] === '=') {
+                        $splitted[$line2] = $splitted[$line2] . $splitted[$line2+1];
+                        unset($splitted[$line2+1]);
+                    }
+                }
+                if ($splitted[$line2] === '') {
+                    unset($splitted[$line2]);
+                }
             }
+
+            $token[$line] = $splitted;
         }
 
         if (!empty($token)) {
@@ -88,7 +104,17 @@ class Lexic
     private function trimmed(): void
     {
         foreach ($this->parsed as $toTrim) {
-            $this->trimmed[] = trim($toTrim, " \t\n\r\0\x0B");
+            $trimmed = trim($toTrim, " \t\n\r\0\x0B");
+            foreach ($this->config['symbols'] as $symbols) {
+                foreach ($symbols as $symbol) {
+                    $replaceItem = " $symbol ";
+                    if (strpos($trimmed, $symbol) !== false) {
+                        $trimmed = str_replace($symbol, $replaceItem, $trimmed);
+                    }
+                }
+            }
+            $trimmed = str_replace('  ', ' ', $trimmed);
+            $this->trimmed[] = $trimmed;
         }
     }
 
@@ -96,7 +122,10 @@ class Lexic
     {
         for ($line = 0; $line < count($tokens); $line++) {
             for ($column = 0; $column < count($tokens[$line]); $column++) {
-                $token = $tokens[$line][$column];
+                if (isset($tokens[$line][$column])) {
+                    $token = $tokens[$line][$column];
+                }
+
                 $word = $this->word($token);
                 $bool = $this->bool($token);
                 $symbols = $this->symbols($token);

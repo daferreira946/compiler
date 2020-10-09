@@ -16,7 +16,7 @@ $file = '../uploads/algoritmo.txt';
 
 $lexic = new Lexic($config, $file);
 $parsed = $lexic->getContent();
-$token = $lexic->getTokenCodigo();
+$token = $lexic->getTokenCode();
 
 if ($token === false) {
     echo "Erro, <a href='../index.php'>clique aqui</a>  para voltar";
