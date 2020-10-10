@@ -123,6 +123,9 @@ class Lexic
         for ($line = 0; $line < count($tokens); $line++) {
             for ($column = 0; $column < count($tokens[$line]); $column++) {
                 if (isset($tokens[$line][$column])) {
+                    if ($tokens[$line][$column] === '') {
+                        unset($tokens[$line][$column]);
+                    }
                     $token = $tokens[$line][$column];
                 }
 
