@@ -1,0 +1,131 @@
+{
+  "program" : "main_block",
+  "main_block" : [
+    "program",
+    "id",
+    ";",
+    "[",
+    "variable_declaration",
+    "]",
+    "*",
+    "begin",
+    "block",
+    "end",
+    "."
+  ],
+  "block" : [
+    "begin",
+    "[",
+    "command",
+    "[",
+    "command",
+    "]",
+    "*",
+    "]",
+    "?",
+    "end",
+    ";"
+  ],
+  "variable_declaration" : [
+    "type",
+    "id",
+    "[",
+    ",",
+    "id",
+    "]",
+    "*",
+    ";"
+  ],
+  "type" : [
+    "integer",
+    "|",
+    "real",
+    "|",
+    "string"
+  ],
+  "comment" : [
+    "{",
+    "'",
+    "?",
+    "'",
+    "}"
+  ],
+  "command" : [
+    "basic_command",
+    "|",
+    "iteration",
+    "|",
+    "if",
+    "(",
+    "relational_expression",
+    ")",
+    "then",
+    "command",
+    "[",
+    "else",
+    "command",
+    "]",
+    "?"
+  ],
+  "basic_command" : [
+    "attribution",
+    "id",
+    ":=",
+    "arithmetic_expression",
+    ";"
+  ],
+  "iteration" : [
+    "while",
+    "(",
+    "relational_expression",
+    ")",
+    "do",
+    "command",
+    "|",
+    "repeat",
+    "command",
+    "until",
+    "(",
+    "relational_expression",
+    ")",
+    ";"
+  ],
+  "value" : [
+    "id",
+    "|",
+    "integer",
+    "|",
+    "real"
+  ],
+  "relational_expression" : [
+    "value",
+    "relational_operator",
+    "value",
+    "|",
+    "(",
+    "relational_expression",
+    ")",
+    "[",
+    "booleans_operators",
+    "(",
+    "relational_expression",
+    ")",
+    "]",
+    "?"
+  ],
+  "arithmetic_expression" : [
+    "value",
+    "|",
+    "value",
+    "arithmetic_operator",
+    "value",
+    "|",
+    "(",
+    "arithmetic_expression",
+    ")",
+    "arithmetic_operator",
+    "(",
+    "arithmetic_expression",
+    ")"
+  ]
+}
