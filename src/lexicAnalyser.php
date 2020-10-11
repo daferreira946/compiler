@@ -3,6 +3,7 @@
 
 use Compiler\src\Decoder;
 use Compiler\src\Lexic;
+use Compiler\src\Syntax;
 
 require '../vendor/autoload.php';
 
@@ -34,6 +35,10 @@ $lexicTable = $lexic->getLexicTable();
 
 $lexicIterator = $lexic->getLexicIterator();
 $lexicIteratorIndex = $lexic->getLexicIteratorIndex();
+
+$syntax = new Syntax($lexicIterator, $lexicIteratorIndex);
+$syntax->syntaxAnalyser();
+die();
 
 echo "<table style='border: black solid;padding: 10px'>";
 for ($i = 0; $i < count($lexicTable); $i++) {

@@ -69,6 +69,22 @@
   ],
   "basic_command" : [
     "attribution",
+    "|",
+    "block",
+    "|",
+    "all",
+    "(",
+    "id",
+    "[",
+    ",",
+    "id",
+    "]",
+    "*",
+    ")",
+    ";"
+  ],
+  "attribution" : [
+    "attribution",
     "id",
     ":=",
     "arithmetic_expression",
