@@ -164,7 +164,7 @@ class Syntax
     private function block()
     {
     }
-<<<<<<< HEAD
+
 
     private function type()
     {
@@ -180,37 +180,19 @@ class Syntax
                 print "<br>";
 
                 $typeIterator->next();
-=======
-     /*"type" : [
-        "integer",
-        "|",
-        "real",
-        "|",
-        "string"
-    ]
-    */
-    private function type()
-    {       
-        $type = new ArrayObject($this->gramatic['type']);
-        $typeIterator = $type->getIterator();     
-        while($typeIterator->valid()){
-            if($typeIterator->current() === $this->lexicTable->current()){
->>>>>>> 0d1a253... Funcao comment e value
                 $this->lexicTable->next();
                 $this->lexicIndexTable->next();
                 return true;
             }
             $typeIterator->next();
-<<<<<<< HEAD
+
         }
 
         $this->error['expected'] = $typeIterator->current();
         $this->error['founded'] = $this->getLexicKey();
-=======
-        }        
->>>>>>> 0d1a253... Funcao comment e value
-        return false;
-    }
+
+    }           
+    
     /*
     "comment" : [
         "{",
