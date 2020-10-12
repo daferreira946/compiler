@@ -76,30 +76,31 @@ class Lexic
 
     public function getLexicIterator(): ArrayIterator
     {
+        $lexicTable = [];
+
         for ($line = 0; $line < count($this->lexicTable); $line++) {
             for ($column = 0; $column < count($this->lexicTable[$line]); $column++) {
-                foreach ($this->lexicTable[$line][$column] as $key => $value) {
-                    $lexicArray[$key] = $value;
+                if (isset($this->lexicTable[$line][$column])) {
+                    foreach ($this->lexicTable[$line][$column] as $key => $value) {
+                        $lexicTable[][$key] = $value;
+                    }
                 }
             }
         }
 
-        $lexicArrayObject = new ArrayObject($lexicArray);
-
-        return $lexicArrayObject->getIterator();
+        return new ArrayIterator($lexicTable);
     }
 
     public function getLexicIteratorIndex(): ArrayIterator
     {
-        $lexicIndexArrayObject = new ArrayObject();
-
+        $lexicIndexTable = [];
         for ($line = 0; $line < count($this->lexicTable); $line++) {
             for ($column = 0; $column < count($this->lexicTable[$line]); $column++) {
-                $lexicIndexArrayObject->append("Linha: [$line] Coluna: [$column]");
+                $lexicIndexTable[] = "Linha: [$line] Coluna: [$column]";
             }
         }
 
-        return $lexicIndexArrayObject->getIterator();
+        return new ArrayIterator($lexicIndexTable);
     }
 
     private function trimmed(): void

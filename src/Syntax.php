@@ -4,7 +4,6 @@
 namespace Compiler\src;
 
 use ArrayIterator;
-use ArrayObject;
 
 class Syntax
 {
@@ -24,7 +23,7 @@ class Syntax
 
     public function syntaxAnalyser()
     {
-        if ($this->program() === false) {
+        if (!$this->program()) {
             echo "<pre>";
             var_dump($this->getError());
             echo "</pre>";
@@ -44,17 +43,27 @@ class Syntax
             . '. ' . $this->lexicIndexTable->current();
     }
 
+    private function getLexicKey()
+    {
+        return key($this->lexicTable->current());
+    }
+
+    private function getLexicValue()
+    {
+        return $this->lexicTable->current()[$this->getLexicKey()];
+    }
+
     /**
      * @return false|mixed
      */
     private function program()
     {
         $main_block = $this->mainBlock();
-        if ($main_block === false) {
+        if (!$main_block) {
             return false;
         }
 
-        return $main_block;
+        return true;
     }
 
     /**
@@ -62,40 +71,34 @@ class Syntax
      */
     private function mainBlock()
     {
-        $mainBlock = new ArrayObject($this->gramatic['main_block']);
-        $mainBlockIterator = $mainBlock->getIterator();
+        $mainBlockIterator = new ArrayIterator($this->gramatic['main_block']);
 
         while ($mainBlockIterator->valid() && $this->lexicTable->valid()) {
             if ($mainBlockIterator->current() === '[') {
                 $mainBlockIterator->next();
-                if ($mainBlockIterator->current() !== 'variable_declaration') {
-                    print "Problema nas configurações";
-                    die();
+                $variableDeclaration = $this->variableDeclaration();
+                if ($variableDeclaration === false) {
+                    return false;
                 }
                 $mainBlockIterator->next();
-                if ($mainBlockIterator->current() !== ']') {
-                    print "Problema nas configurações";
-                    die();
-                }
                 $mainBlockIterator->next();
-                $this->variableDeclaration($mainBlockIterator->current());
                 $mainBlockIterator->next();
             }
             if ($mainBlockIterator->current() === 'block') {
                 $this->block();
                 $mainBlockIterator->next();
             }
-            if ($mainBlockIterator->current() !== $this->lexicTable->key()) {
+            if ($mainBlockIterator->current() !== $this->getLexicKey()) {
                 $this->error['expected'] = $mainBlockIterator->current();
-                $this->error['founded'] = $mainBlockIterator->current();
+                $this->error['founded'] = $this->getLexicKey();
                 return false;
             }
 
             print $mainBlockIterator->current();
             print " => ";
-            print $this->lexicTable->key();
+            print $this->getLexicKey();
             print " = ";
-            print $this->lexicTable->current();
+            print $this->getLexicValue();
             print "<br>";
 
             $mainBlockIterator->next();
@@ -106,37 +109,85 @@ class Syntax
         return true;
     }
 
-    private function variableDeclaration(string $repeat)
+    private function variableDeclaration()
     {
+        $variableDeclarationIterator = new ArrayIterator($this->gramatic['variable_declaration']);
+
+        while ($variableDeclarationIterator->valid()) {
+            if ($variableDeclarationIterator->current() === 'type') {
+                $type = $this->type();
+                if (!$type) {
+                    return false;
+                }
+                $variableDeclarationIterator->next();
+            }
+            if ($variableDeclarationIterator->current() === '[') {
+                while ($variableDeclarationIterator->current() !== '*') {
+                    $variableDeclarationIterator->next();
+                    if ($variableDeclarationIterator->current() !== $this->getLexicKey()) {
+                        $this->error['expected'] = $variableDeclarationIterator->current();
+                        $this->error['founded'] = $this->getLexicKey();
+                        return false;
+                    }
+                    print $variableDeclarationIterator->current();
+                    print " => ";
+                    print $this->getLexicKey();
+                    print " = ";
+                    print $this->getLexicValue();
+                    print "<br>";
+                    $this->lexicTable->next();
+                    $this->lexicIndexTable->next();
+                }
+                $variableDeclarationIterator->next();
+            }
+            if ($variableDeclarationIterator->current() !== $this->getLexicKey()) {
+                $this->error['expected'] = $variableDeclarationIterator->current();
+                $this->error['founded'] = $this->getLexicKey();
+                return false;
+            }
+
+            print $variableDeclarationIterator->current();
+            print " => ";
+            print $this->getLexicKey();
+            print " = ";
+            print $this->getLexicValue();
+            print "<br>";
+
+            $variableDeclarationIterator->next();
+            $this->lexicTable->next();
+            $this->lexicIndexTable->next();
+        }
+
+        return true;
     }
 
     private function block()
     {
     }
-     /*"type" : [
-        "integer",
-        
-        "real",
-    
-        "string"
-    ],
-    */
+
     private function type()
-    {       
-        $type = new ArrayObject($this->gramatic['type']);
-        $typeIterator = $type->getIterator();            
+    {
+        $typeIterator = new ArrayIterator($this->gramatic['type']);
 
+        while ($typeIterator->valid()) {
+            if ($typeIterator->current() === $this->getLexicValue()) {
+                print $typeIterator->current();
+                print " => ";
+                print $this->getLexicKey();
+                print " = ";
+                print $this->getLexicValue();
+                print "<br>";
 
-        while($typeIterator->valid()){
-            if($typeIterator->current() === $this->$lexicTable->current()){
-
+                $typeIterator->next();
                 $this->lexicTable->next();
                 $this->lexicIndexTable->next();
-                return $typeIterator->current();
+                return true;
             }
             $typeIterator->next();
+        }
 
-        }        
+        $this->error['expected'] = $typeIterator->current();
+        $this->error['founded'] = $this->getLexicKey();
         return false;
     }
 }
