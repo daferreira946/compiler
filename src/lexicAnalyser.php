@@ -38,7 +38,6 @@ $lexicIteratorIndex = $lexic->getLexicIteratorIndex();
 
 $syntax = new Syntax($lexicIterator, $lexicIteratorIndex);
 $syntax->syntaxAnalyser();
-die();
 
 echo "<table style='border: black solid;padding: 10px'>";
 for ($i = 0; $i < count($lexicTable); $i++) {
