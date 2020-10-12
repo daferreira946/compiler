@@ -26,21 +26,17 @@ class Syntax
             return $this->getError();
         }
 
-        echo "<pre>";
-        var_dump($this->program());
-        echo "</pre>";
-
         return true;
     }
 
-    private function getError(string $expected)
+    private function getError()
     {
         return $this->error;
     }
 
     private function setError(string $expected)
     {
-        $error = 'Erro sintático: esperado ' . $expected . ', encontrado ' . $this->getLexicKey()
+        $this->error = 'Erro sintático: esperado ' . $expected . ', encontrado ' . $this->getLexicKey()
         . '. ' . $this->lexicIndexTable->current();
     }
 
@@ -100,6 +96,38 @@ class Syntax
         if (!$variableDeclaration) {
             return false;
         }
+        
+        if ($this->getLexicKey() !== 'begin') {
+            $this->setError('begin');
+            return false;
+        }
+
+        $this->print('begin');
+
+        $this->lexicTable->next();
+        $this->lexicIndexTable->next();
+
+        //$block = $this->block();
+        //if (!$block) {
+        //    return false;
+        //}
+
+        if ($this->getLexicKey() !== 'end') {
+            $this->setError('end');
+            return false;
+        }
+
+        $this->print('end');
+
+        $this->lexicTable->next();
+        $this->lexicIndexTable->next();
+
+        if ($this->getLexicKey() !== '.') {
+            $this->setError('.');
+            return false;
+        }
+
+        $this->print('.');
 
         return true;
     }
