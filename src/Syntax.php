@@ -47,9 +47,6 @@ class Syntax
      */
     private function program()
     {
-        if (!array_key_exists('program', $this->gramatic)) {
-            return false;
-        }
         $main_block = $this->mainBlock();
         if ($main_block === false) {
             return false;
@@ -63,9 +60,6 @@ class Syntax
      */
     private function mainBlock()
     {
-        if (!array_key_exists('main_block', $this->gramatic)) {
-            return false;
-        }
         $mainBlock = new ArrayObject($this->gramatic['main_block']);
         $mainBlockIterator = $mainBlock->getIterator();
 
@@ -89,20 +83,18 @@ class Syntax
                 $this->block();
                 $mainBlockIterator->next();
             }
-            foreach ($this->lexicTable->current() as $key => $value) {
-                if ($mainBlockIterator->current() !== $key) {
-                    $this->error['expected'] = $mainBlockIterator->current();
-                    $this->error['founded'] = $mainBlockIterator->current();
-                    return false;
-                }
-
-                print $mainBlockIterator->current();
-                print " => ";
-                print $key;
-                print " = ";
-                print $value;
-                print "<br>";
+            if ($mainBlockIterator->current() !== $this->lexicTable->key()) {
+                $this->error['expected'] = $mainBlockIterator->current();
+                $this->error['founded'] = $mainBlockIterator->current();
+                return false;
             }
+
+            print $mainBlockIterator->current();
+            print " => ";
+            print $this->lexicTable->key();
+            print " = ";
+            print $this->lexicTable->current();
+            print "<br>";
 
             $mainBlockIterator->next();
             $this->lexicTable->next();

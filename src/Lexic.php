@@ -76,14 +76,15 @@ class Lexic
 
     public function getLexicIterator(): ArrayIterator
     {
-        $lexicArrayObject = new ArrayObject();
-
         for ($line = 0; $line < count($this->lexicTable); $line++) {
             for ($column = 0; $column < count($this->lexicTable[$line]); $column++) {
-                $lexicArrayObject->append($this->lexicTable[$line][$column]);
+                foreach ($this->lexicTable[$line][$column] as $key => $value) {
+                    $lexicArray[$key] = $value;
+                }
             }
         }
 
+        $lexicArrayObject = new ArrayObject($lexicArray);
 
         return $lexicArrayObject->getIterator();
     }
