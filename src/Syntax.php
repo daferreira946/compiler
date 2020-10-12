@@ -26,17 +26,21 @@ class Syntax
             return $this->getError();
         }
 
+        echo "<pre>";
+        var_dump($this->program());
+        echo "</pre>";
+
         return true;
     }
 
-    private function getError()
+    private function getError(string $expected)
     {
         return $this->error;
     }
 
     private function setError(string $expected)
     {
-        $this->error = 'Erro sintático: esperado ' . $expected . ', encontrado ' . $this->getLexicKey()
+        $error = 'Erro sintático: esperado ' . $expected . ', encontrado ' . $this->getLexicKey()
         . '. ' . $this->lexicIndexTable->current();
     }
 
@@ -96,38 +100,6 @@ class Syntax
         if (!$variableDeclaration) {
             return false;
         }
-        
-        if ($this->getLexicKey() !== 'begin') {
-            $this->setError('begin');
-            return false;
-        }
-
-        $this->print('begin');
-
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
-
-        //$block = $this->block();
-        //if (!$block) {
-        //    return false;
-        //}
-
-        if ($this->getLexicKey() !== 'end') {
-            $this->setError('end');
-            return false;
-        }
-
-        $this->print('end');
-
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
-
-        if ($this->getLexicKey() !== '.') {
-            $this->setError('.');
-            return false;
-        }
-
-        $this->print('.');
 
         return true;
     }
@@ -162,4 +134,43 @@ class Syntax
 
         return true;
     }
+    /*
+    "comment" : [
+        "{",        
+        "}"
+      ]
+    */
+    private function comment()
+    {           
+        if($this->getLexicValue() !== '{'){  
+            $this->setError ('{');          
+            return false;
+        }   
+        while($this->lexicTable->valid()){
+            if($this->getLexicValue() === "}"){ 
+                $this->lexicTable->next();
+                $this->lexicIndexTable->next();                
+                return true;
+            }
+            $this->lexicTable->next();
+            $this->lexicIndexTable->next();
+        }
+        $this->setError ('}');               
+        return false;
+    } 
+    /* "value" : [
+        "id",        
+        "integer",        
+        "real"
+    ]
+    ]*/
+    private function value(){       
+        if($this->getLexicKey() !== "id" | $this->getLexicKey() !== "integer" | $this->getLexicKey() !== "real" ){
+            $this->lexicTable->next();
+            $this->lexicIndexTable->next();
+            $this->setError ("id | integer | real");
+            return false;
+        }          
+        return true;
+    }  
 }
