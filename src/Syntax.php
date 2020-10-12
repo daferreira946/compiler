@@ -164,6 +164,7 @@ class Syntax
     private function block()
     {
     }
+<<<<<<< HEAD
 
     private function type()
     {
@@ -179,15 +180,83 @@ class Syntax
                 print "<br>";
 
                 $typeIterator->next();
+=======
+     /*"type" : [
+        "integer",
+        "|",
+        "real",
+        "|",
+        "string"
+    ]
+    */
+    private function type()
+    {       
+        $type = new ArrayObject($this->gramatic['type']);
+        $typeIterator = $type->getIterator();     
+        while($typeIterator->valid()){
+            if($typeIterator->current() === $this->lexicTable->current()){
+>>>>>>> 0d1a253... Funcao comment e value
                 $this->lexicTable->next();
                 $this->lexicIndexTable->next();
                 return true;
             }
             $typeIterator->next();
+<<<<<<< HEAD
         }
 
         $this->error['expected'] = $typeIterator->current();
         $this->error['founded'] = $this->getLexicKey();
+=======
+        }        
+>>>>>>> 0d1a253... Funcao comment e value
         return false;
     }
+    /*
+    "comment" : [
+        "{",
+        "'",
+        "?",
+        "'",
+        "}"
+      ]
+     */
+    private function comment()
+    {     
+        if($this->lexicTable->current() !== "{"){            
+            return false;
+        }    
+        while($this->lexicTable->valid()){
+            if($this->lexicTable->current() === "}"){ 
+                $this->lexicTable->next();
+                $this->lexicIndexTable->next();                
+                return true;
+            }
+            $this->lexicTable->next();
+            $this->lexicIndexTable->next();
+        }        
+        return false;
+    } 
+    /* "value" : [
+        "id",
+        "|",
+        "integer",
+        "|",
+        "real"
+    ]*/
+    private function value()
+    {     
+        $value = new ArrayObject($this->gramatic['value']);
+        $valueIterator = $value->getIterator(); 
+        while($valueIterator->valid()){
+            if($valueIterator->current() === $this->lexicTable->current()){
+                $this->lexicTable->next();
+                $this->lexicIndexTable->next();
+                return true;
+            }
+            $valueIterator->next();
+        }        
+        return false;
+
+    }    
+
 }
