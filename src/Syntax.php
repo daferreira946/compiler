@@ -11,7 +11,7 @@ class Syntax
     private array $gramatic;
     private ArrayIterator $lexicTable;
     private ArrayIterator $lexicIndexTable;
-    private $error;
+    private array $error;
 
     public function __construct(ArrayIterator $lexicTable, ArrayIterator $lexicIndexTable)
     {
@@ -34,6 +34,8 @@ class Syntax
         echo "<pre>";
         var_dump($this->program());
         echo "</pre>";
+
+        return true;
     }
 
     private function getError()
@@ -101,16 +103,14 @@ class Syntax
             $this->lexicIndexTable->next();
         }
 
-        return;
+        return true;
     }
 
     private function variableDeclaration(string $repeat)
     {
-        
     }
 
     private function block()
     {
-
     }
 }
