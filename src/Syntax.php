@@ -113,4 +113,30 @@ class Syntax
     private function block()
     {
     }
+     /*"type" : [
+        "integer",
+        
+        "real",
+    
+        "string"
+    ],
+    */
+    private function type()
+    {       
+        $type = new ArrayObject($this->gramatic['type']);
+        $typeIterator = $type->getIterator();            
+
+
+        while($typeIterator->valid()){
+            if($typeIterator->current() === $this->$lexicTable->current()){
+
+                $this->lexicTable->next();
+                $this->lexicIndexTable->next();
+                return $typeIterator->current();
+            }
+            $typeIterator->next();
+
+        }        
+        return false;
+    }
 }
