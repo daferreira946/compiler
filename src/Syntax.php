@@ -210,6 +210,13 @@ class Syntax
             $this->lexicalIndexTable->next();
         }
 
+        if ($this->getLexicalKey() === '{') {
+            $comment = $this->comment();
+            if (!$comment) {
+                return false;
+            }
+        }
+
         echo htmlspecialchars("</Variable_Declaration>") . '<br>';
         return true;
     }
@@ -271,6 +278,13 @@ class Syntax
 
         $this->lexicalTable->next();
         $this->lexicalIndexTable->next();
+
+        if ($this->getLexicalKey() === '{') {
+            $comment = $this->comment();
+            if (!$comment) {
+                return false;
+            }
+        }
 
         echo htmlspecialchars("</Block>") . '<br>';
         return true;
@@ -362,6 +376,13 @@ class Syntax
                 return false;
             }
             return true;
+        }
+
+        if ($this->getLexicalKey() === '{') {
+            $comment = $this->comment();
+            if (!$comment) {
+                return false;
+            }
         }
 
         echo htmlspecialchars("</Command>") . '<br>';
@@ -462,6 +483,12 @@ class Syntax
         $this->lexicalTable->next();
         $this->lexicalIndexTable->next();
 
+        if ($this->getLexicalKey() === '{') {
+            $comment = $this->comment();
+            if (!$comment) {
+                return false;
+            }
+        }
 
         echo htmlspecialchars("</Basic_Command>") . '<br>';
         return true;
@@ -507,6 +534,13 @@ class Syntax
 
         $this->lexicalTable->next();
         $this->lexicalIndexTable->next();
+
+        if ($this->getLexicalKey() === '{') {
+            $comment = $this->comment();
+            if (!$comment) {
+                return false;
+            }
+        }
 
         echo htmlspecialchars("</Attribution>") . '<br>';
         return true;
@@ -607,6 +641,13 @@ class Syntax
             return true;
         }
 
+        if ($this->getLexicalKey() === '{') {
+            $comment = $this->comment();
+            if (!$comment) {
+                return false;
+            }
+        }
+
         echo htmlspecialchars("</Arithmetic_Expression>") . '<br>';
         return true;
     }
@@ -683,6 +724,13 @@ class Syntax
 
         $this->lexicalTable->next();
         $this->lexicalIndexTable->next();
+
+        if ($this->getLexicalKey() === '{') {
+            $comment = $this->comment();
+            if (!$comment) {
+                return false;
+            }
+        }
 
         echo htmlspecialchars("</Value>") . '<br>';
         return true;
@@ -796,6 +844,13 @@ class Syntax
         $this->lexicalTable->next();
         $this->lexicalIndexTable->next();
 
+        if ($this->getLexicalKey() === '{') {
+            $comment = $this->comment();
+            if (!$comment) {
+                return false;
+            }
+        }
+
         echo htmlspecialchars("</Iteration>") . '<br>';
         return true;
     }
@@ -884,6 +939,13 @@ class Syntax
         $value = $this->value();
         if (!$value) {
             return false;
+        }
+
+        if ($this->getLexicalKey() === '{') {
+            $comment = $this->comment();
+            if (!$comment) {
+                return false;
+            }
         }
 
         echo htmlspecialchars("</Relational_Expression>") . '<br>';
