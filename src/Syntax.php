@@ -233,6 +233,8 @@ class Syntax
 
         $this->lexicTable->next();
         $this->lexicIndexTable->next();
+
+        return true;
     }
 
     private function arithmeticExpression()
@@ -331,43 +333,34 @@ class Syntax
 
         return true;
     }
-    /*
-    "comment" : [
-        "{",        
-        "}"
-      ]
-    */
+
     private function comment()
-    {           
-        if($this->getLexicValue() !== '{'){  
-            $this->setError ('{');          
+    {
+        if ($this->getLexicValue() !== '{') {
+            $this->setError('{');
             return false;
-        }   
-        while($this->lexicTable->valid()){
-            if($this->getLexicValue() === "}"){ 
+        }
+        while ($this->lexicTable->valid()) {
+            if ($this->getLexicValue() === "}") {
                 $this->lexicTable->next();
-                $this->lexicIndexTable->next();                
+                $this->lexicIndexTable->next();
                 return true;
             }
             $this->lexicTable->next();
             $this->lexicIndexTable->next();
         }
-        $this->setError ('}');               
+        $this->setError('}');
         return false;
-    } 
-    /* "value" : [
-        "id",        
-        "integer",        
-        "real"
-    ]
-    ]*/
-    private function value(){       
-        if($this->getLexicKey() !== "id" | $this->getLexicKey() !== "integer" | $this->getLexicKey() !== "real" ){
+    }
+
+    private function value()
+    {
+        if ($this->getLexicKey() !== "id" | $this->getLexicKey() !== "integer" | $this->getLexicKey() !== "real") {
             $this->lexicTable->next();
             $this->lexicIndexTable->next();
-            $this->setError ("id | integer | real");
+            $this->setError("id | integer | real");
             return false;
-        }          
+        }
         return true;
     }
 }
