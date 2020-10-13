@@ -233,6 +233,8 @@ class Syntax
 
         $this->lexicTable->next();
         $this->lexicIndexTable->next();
+
+        return true;
     }
 
     private function arithmeticExpression()
@@ -329,6 +331,36 @@ class Syntax
             return true;
         }
 
+        return true;
+    }
+
+    private function comment()
+    {
+        if ($this->getLexicValue() !== '{') {
+            $this->setError('{');
+            return false;
+        }
+        while ($this->lexicTable->valid()) {
+            if ($this->getLexicValue() === "}") {
+                $this->lexicTable->next();
+                $this->lexicIndexTable->next();
+                return true;
+            }
+            $this->lexicTable->next();
+            $this->lexicIndexTable->next();
+        }
+        $this->setError('}');
+        return false;
+    }
+
+    private function value()
+    {
+        if ($this->getLexicKey() !== "id" | $this->getLexicKey() !== "integer" | $this->getLexicKey() !== "real") {
+            $this->lexicTable->next();
+            $this->lexicIndexTable->next();
+            $this->setError("id | integer | real");
+            return false;
+        }
         return true;
     }
 }
