@@ -36,23 +36,24 @@ $lexicTable = $lexic->getLexicTable();
 $lexicIterator = $lexic->getLexicIterator();
 $lexicIteratorIndex = $lexic->getLexicIteratorIndex();
 
-$syntax = new Syntax($lexicIterator, $lexicIteratorIndex);
-$syntax->syntaxAnalyser();
-
-
 echo "<table style='border: black solid;padding: 10px'>";
-for ($i = 0; $i < count($lexicTable); $i++) {
-    for ($a = 0; $a < count($lexicTable[$i]); $a++) {
-        foreach ($lexicTable[$i][$a] as $token => $value) {
+echo "<h1>Tabela Sintática</h1>";
+foreach ($lexicTable as $line => $lines) {
+    foreach ($lines as $column => $values) {
+        foreach ($values as $token => $value) {
             echo "<tr style='border: black solid;padding: 10px'>";
-                echo "<td style='border: black solid;padding: 10px'>";
-                    echo "Position $i : $a";
-                echo "</td>";
-                echo "<td style='border: black solid;padding: 10px'>";
-                    echo " |$token| => |$value|";
-                echo "</td>";
+            echo "<td style='border: black solid;padding: 10px'>";
+            echo "Position $line : $column";
+            echo "</td>";
+            echo "<td style='border: black solid;padding: 10px'>";
+            echo " |$token| => |$value|";
+            echo "</td>";
             echo "</tr>";
         }
     }
 }
 echo "</table>";
+
+$syntax = new Syntax($lexicIterator, $lexicIteratorIndex);
+echo "<h1>Sintático</h1>";
+$syntax->syntaxAnalyser();
