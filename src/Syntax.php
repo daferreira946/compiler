@@ -175,11 +175,9 @@ class Syntax
         $this->lexicTable->next();
         $this->lexicIndexTable->next();
 
-        if ($this->getLexicKey() === 'id') {
-            $attribution = $this->attribution();
-            if (!$attribution) {
-                return false;
-            }
+        $command = $this->command();
+        if (!$command) {
+            return false;
         }
 
         if ($this->getLexicKey() !== 'end') {
@@ -202,13 +200,39 @@ class Syntax
         return true;
     }
 
+    private function command()
+    {
+        $basicCommand = $this->basicCommand();
+        if (!$basicCommand) {
+            return false;
+        }
+        return true;
+    }
+
+    private function basicCommand()
+    {
+        if ($this->getLexicKey() === 'id') {
+            $attribution = $this->attribution();
+            if (!$attribution) {
+                return false;
+            }
+        }
+
+        if ($this->getLexicKey() === 'while' | $this->getLexicKey() === 'repeat') {
+            $attribution = $this->iteration();
+            if (!$attribution) {
+                return false;
+            }
+        }
+    }
+
     private function attribution()
     {
         $this->print('id');
 
         $this->lexicTable->next();
         $this->lexicIndexTable->next();
-        
+
         if ($this->getLexicKey() !== ':=') {
             $this->setError(':=');
             return false;
@@ -259,7 +283,7 @@ class Syntax
 
             $this->lexicTable->next();
             $this->lexicIndexTable->next();
-            
+
             if ($this->getLexicKey() !== '+' |
                 $this->getLexicKey() !== '-' |
                 $this->getLexicKey() !== '*' |
@@ -356,5 +380,50 @@ class Syntax
         $this->lexicTable->next();
         $this->lexicIndexTable->next();
         return true;
+    }
+
+    private function iteration()
+    {
+        if ($this->getLexicKey() === 'while') {
+            $this->print('while');
+            $this->lexicTable->next();
+            $this->lexicIndexTable->next();
+
+            if ($this->getLexicKey() !== '(') {
+                $this->setError('(');
+                return false;
+            }
+            $this->print('(');
+            $this->lexicTable->next();
+            $this->lexicIndexTable->next();
+
+            $relationalExpretion = $this->relationalExpression();
+            if (!$relationalExpretion) {
+                return false;
+            }
+
+            if ($this->getLexicKey() !== ')') {
+                $this->setError(')');
+                return false;
+            }
+            $this->print(')');
+            $this->lexicTable->next();
+            $this->lexicIndexTable->next();
+
+            if ($this->getLexicKey() !== 'do') {
+                $this->setError('do');
+                return false;
+            }
+            $this->print('do');
+            $this->lexicTable->next();
+            $this->lexicIndexTable->next();
+
+            return true;
+        }
+    }
+
+    private function relationalExpression()
+    {
+
     }
 }
