@@ -281,6 +281,7 @@ class Syntax
 
     private function command()
     {
+        /** @noinspection HtmlDeprecatedTag */
         echo htmlspecialchars("<Command>") . '<br>';
 
         if ($this->getLexicKey() === '{') {
