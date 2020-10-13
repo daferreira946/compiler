@@ -19,6 +19,8 @@ class Syntax
 
     public function syntaxAnalyser(): bool
     {
+        echo "<h1>Análise sintática</h1>";
+
         $program = $this->program();
         if (!$program) {
             echo $this->error . "<br>";

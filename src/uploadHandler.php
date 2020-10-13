@@ -12,7 +12,7 @@ $uploader = new Uploader($name);
 if ($uploader->moveFile($origin)) {
     echo "O algoritmo foi recebido com sucesso.";
     echo "<br>";
-    echo "Para ver a tabela léxica <a href='lexicalAnalyser.php'>clique aqui</a>";
+    echo "Para ver a tabela léxica <a href='compileHandler.php'>clique aqui</a>";
 } else {
     echo "Desculpe, houve um erro ao fazer o upload do seu arquivo.<br>";
     echo "<br><a href='../index.php'>voltar</a>";
