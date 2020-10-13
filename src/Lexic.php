@@ -81,10 +81,10 @@ class Lexic
     {
         $lexicTable = [];
 
-        for ($line = 0; $line < count($this->lexicTable); $line++) {
-            for ($column = 0; $column < count($this->lexicTable[$line]); $column++) {
+        foreach ($this->lexicTable as $line => $lines) {
+            foreach ($lines as $column => $values) {
                 if (isset($this->lexicTable[$line][$column])) {
-                    foreach ($this->lexicTable[$line][$column] as $key => $value) {
+                    foreach ($values as $key => $value) {
                         $lexicTable[][$key] = $value;
                     }
                 }
@@ -97,8 +97,8 @@ class Lexic
     public function getLexicIteratorIndex(): ArrayIterator
     {
         $lexicIndexTable = [];
-        for ($line = 0; $line < count($this->lexicTable); $line++) {
-            for ($column = 0; $column < count($this->lexicTable[$line]); $column++) {
+        foreach ($this->lexicTable as $line => $lines) {
+            foreach ($lines as $column => $value) {
                 $lexicIndexTable[] = "Linha: [$line] Coluna: [$column]";
             }
         }

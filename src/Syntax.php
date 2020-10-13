@@ -301,15 +301,10 @@ class Syntax
             return true;
         }
 
-        if ($this->getLexicKey() !== 'id' | $this->getLexicKey() !== 'integer' | $this->getLexicKey() !== 'real') {
-            $this->setError('id ou integer ou real');
+        $value = $this->value();
+        if (!$value) {
             return false;
         }
-
-        $this->print($this->getLexicKey());
-
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
 
         if ($this->getLexicKey() === '+' |
             $this->getLexicKey() === '-' |
@@ -320,14 +315,11 @@ class Syntax
             $this->lexicTable->next();
             $this->lexicIndexTable->next();
 
-            if ($this->getLexicKey() !== 'id' | $this->getLexicKey() !== 'integer' | $this->getLexicKey() !== 'real') {
-                $this->setError('id ou integer ou real');
+            $value = $this->value();
+            if (!$value) {
                 return false;
             }
-            $this->print($this->getLexicKey());
 
-            $this->lexicTable->next();
-            $this->lexicIndexTable->next();
             return true;
         }
 
@@ -355,12 +347,14 @@ class Syntax
 
     private function value()
     {
-        if ($this->getLexicKey() !== "id" | $this->getLexicKey() !== "integer" | $this->getLexicKey() !== "real") {
-            $this->lexicTable->next();
-            $this->lexicIndexTable->next();
-            $this->setError("id | integer | real");
+        if ($this->getLexicKey() !== "id" && $this->getLexicKey() !== "integer" && $this->getLexicKey() !== "real") {
+            $this->setError("id ou integer ou real");
             return false;
         }
+
+        $this->print($this->getLexicKey());
+        $this->lexicTable->next();
+        $this->lexicIndexTable->next();
         return true;
     }
 }
