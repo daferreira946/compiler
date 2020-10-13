@@ -2,7 +2,7 @@
 
 
 use Compiler\src\Decoder;
-use Compiler\src\Lexic;
+use Compiler\src\Lexical;
 use Compiler\src\Syntax;
 
 require '../vendor/autoload.php';
@@ -15,30 +15,30 @@ $config = $decoder->getConfig();
 
 $file = '../uploads/algoritmo.txt';
 
-$lexic = new Lexic($config, $file);
-$parsed = $lexic->getContent();
-$token = $lexic->getTokenCode();
+$lexical = new Lexical($config, $file);
+$parsed = $lexical->getContent();
+$token = $lexical->getTokenCode();
 
 if ($token === false) {
     echo "Erro, <a href='../index.php'>clique aqui</a>  para voltar";
 }
 
-$lexic->lexicAnalyzer($token);
+$lexical->lexicalAnalyzer($token);
 
-if ($lexic->getErrors() !== false) {
-    $errors = $lexic->getErrors();
+if ($lexical->getErrors() !== false) {
+    $errors = $lexical->getErrors();
     echo $openPre . var_dump($errors) . $closePre;
     die();
 }
 
-$lexicTable = $lexic->getLexicTable();
+$lexicalTable = $lexical->getLexicalTable();
 
-$lexicIterator = $lexic->getLexicIterator();
-$lexicIteratorIndex = $lexic->getLexicIteratorIndex();
+$lexicalIterator = $lexical->getLexicalIterator();
+$lexicalIteratorIndex = $lexical->getLexicalIteratorIndex();
 
 echo "<table style='border: black solid;padding: 10px'>";
 echo "<h1>Tabela Sintática</h1>";
-foreach ($lexicTable as $line => $lines) {
+foreach ($lexicalTable as $line => $lines) {
     foreach ($lines as $column => $values) {
         foreach ($values as $token => $value) {
             echo "<tr style='border: black solid;padding: 10px'>";
@@ -54,6 +54,6 @@ foreach ($lexicTable as $line => $lines) {
 }
 echo "</table>";
 
-$syntax = new Syntax($lexicIterator, $lexicIteratorIndex);
+$syntax = new Syntax($lexicalIterator, $lexicalIteratorIndex);
 echo "<h1>Sintático</h1>";
 $syntax->syntaxAnalyser();

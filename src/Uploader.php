@@ -2,8 +2,6 @@
 
 namespace Compiler\src;
 
-require '../vendor/autoload.php';
-
 class Uploader
 {
     /**

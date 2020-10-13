@@ -8,13 +8,13 @@ use ArrayIterator;
 class Syntax
 {
     private string $error;
-    private ArrayIterator $lexicTable;
-    private ArrayIterator $lexicIndexTable;
+    private ArrayIterator $lexicalTable;
+    private ArrayIterator $lexicalIndexTable;
 
-    public function __construct(ArrayIterator $lexicTable, ArrayIterator $lexicIndexTable)
+    public function __construct(ArrayIterator $lexicalTable, ArrayIterator $lexicalIndexTable)
     {
-        $this->lexicTable = $lexicTable;
-        $this->lexicIndexTable = $lexicIndexTable;
+        $this->lexicalTable = $lexicalTable;
+        $this->lexicalIndexTable = $lexicalIndexTable;
     }
 
     public function syntaxAnalyser(): bool
@@ -36,27 +36,27 @@ class Syntax
 
     private function setError(string $expected): void
     {
-        $this->error = 'Erro sintático: esperado ' . $expected . ', encontrado ' . $this->getLexicKey()
-        . '. ' . $this->lexicIndexTable->current();
+        $this->error = 'Erro sintático: esperado ' . $expected . ', encontrado ' . $this->getLexicalKey()
+        . '. ' . $this->lexicalIndexTable->current();
     }
 
-    private function getLexicKey(): string
+    private function getLexicalKey(): string
     {
-        return key($this->lexicTable->current());
+        return key($this->lexicalTable->current());
     }
 
-    private function getLexicValue(): string
+    private function getLexicalValue(): string
     {
-        return $this->lexicTable->current()[$this->getLexicKey()];
+        return $this->lexicalTable->current()[$this->getLexicalKey()];
     }
 
     private function print(string $expected): void
     {
         print $expected;
         print " => ";
-        print $this->getLexicKey();
+        print $this->getLexicalKey();
         print " = ";
-        print $this->getLexicValue();
+        print $this->getLexicalValue();
         print "<br>";
     }
 
@@ -64,7 +64,7 @@ class Syntax
     {
         echo htmlspecialchars("<Program>") . '<br>';
 
-        if ($this->getLexicKey() === '{') {
+        if ($this->getLexicalKey() === '{') {
             $comment = $this->comment();
             if (!$comment) {
                 return false;
@@ -85,80 +85,80 @@ class Syntax
     {
         echo htmlspecialchars("<Main_Block>") . '<br>';
 
-        if ($this->getLexicKey() === '{') {
+        if ($this->getLexicalKey() === '{') {
             $comment = $this->comment();
             if (!$comment) {
                 return false;
             }
         }
 
-        if ($this->getLexicKey() !== 'program') {
+        if ($this->getLexicalKey() !== 'program') {
             $this->setError('program');
             return false;
         }
         $this->print('program');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
-        if ($this->getLexicKey() !== 'id') {
+        if ($this->getLexicalKey() !== 'id') {
             $this->setError('id');
             return false;
         }
         $this->print('id');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
-        if ($this->getLexicKey() !== ';') {
+        if ($this->getLexicalKey() !== ';') {
             $this->setError(';');
             return false;
         }
         $this->print(';');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
         $variableDeclaration = $this->variableDeclaration();
         if (!$variableDeclaration) {
             return false;
         }
 
-        if ($this->getLexicKey() !== 'begin') {
+        if ($this->getLexicalKey() !== 'begin') {
             $this->setError('begin');
             return false;
         }
         $this->print('begin');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
         $block = $this->block();
         if (!$block) {
             return false;
         }
 
-        if ($this->getLexicKey() !== 'end') {
+        if ($this->getLexicalKey() !== 'end') {
             $this->setError('end');
             return false;
         }
 
         $this->print('end');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
-        if ($this->getLexicKey() !== '.') {
+        if ($this->getLexicalKey() !== '.') {
             $this->setError('.');
             return false;
         }
         $this->print('.');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
-        if ($this->lexicTable->valid() !== false) {
-            if ($this->getLexicKey() !== '{') {
+        if ($this->lexicalTable->valid() !== false) {
+            if ($this->getLexicalKey() !== '{') {
                 $this->setError('{');
                 return false;
             }
@@ -177,37 +177,37 @@ class Syntax
     {
         echo htmlspecialchars("<Variable_Declaration>") . '<br>';
 
-        if ($this->getLexicKey() === '{') {
+        if ($this->getLexicalKey() === '{') {
             $comment = $this->comment();
             if (!$comment) {
                 return false;
             }
         }
 
-        while ($this->getLexicKey() === 'integer' |
-            $this->getLexicKey() === 'real' |
-            $this->getLexicKey() === 'string') {
-            $this->print($this->getLexicKey());
-            while ($this->getLexicKey() !== ';') {
-                $this->lexicTable->next();
-                $this->lexicIndexTable->next();
-                if ($this->getLexicKey() !== 'id') {
+        while ($this->getLexicalKey() === 'integer' |
+            $this->getLexicalKey() === 'real' |
+            $this->getLexicalKey() === 'string') {
+            $this->print($this->getLexicalKey());
+            while ($this->getLexicalKey() !== ';') {
+                $this->lexicalTable->next();
+                $this->lexicalIndexTable->next();
+                if ($this->getLexicalKey() !== 'id') {
                     $this->setError('id');
                     return false;
                 }
                 $this->print('id');
 
-                $this->lexicTable->next();
-                $this->lexicIndexTable->next();
-                if ($this->getLexicKey() !== ',' && $this->getLexicKey() !== ';') {
+                $this->lexicalTable->next();
+                $this->lexicalIndexTable->next();
+                if ($this->getLexicalKey() !== ',' && $this->getLexicalKey() !== ';') {
                     $this->setError(', ou ;');
                     return false;
                 }
-                $this->print($this->getLexicKey());
+                $this->print($this->getLexicalKey());
             }
 
-            $this->lexicTable->next();
-            $this->lexicIndexTable->next();
+            $this->lexicalTable->next();
+            $this->lexicalIndexTable->next();
         }
 
         echo htmlspecialchars("</Variable_Declaration>") . '<br>';
@@ -218,35 +218,35 @@ class Syntax
     {
         echo htmlspecialchars("<Block>") . '<br>';
 
-        if ($this->getLexicKey() === '{') {
+        if ($this->getLexicalKey() === '{') {
             $comment = $this->comment();
             if (!$comment) {
                 return false;
             }
         }
 
-        if ($this->getLexicKey() !== 'begin') {
+        if ($this->getLexicalKey() !== 'begin') {
             $this->setError('begin');
             return false;
         }
         $this->print('begin');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
-        if ($this->getLexicKey() === 'id' |
-            $this->getLexicKey() === 'begin' |
-            $this->getLexicKey() === 'all' |
-            $this->getLexicKey() === 'while' |
-            $this->getLexicKey() === 'repeat' |
-            $this->getLexicKey() !== 'if'
+        if ($this->getLexicalKey() === 'id' |
+            $this->getLexicalKey() === 'begin' |
+            $this->getLexicalKey() === 'all' |
+            $this->getLexicalKey() === 'while' |
+            $this->getLexicalKey() === 'repeat' |
+            $this->getLexicalKey() !== 'if'
         ) {
             $command = $this->command();
             if (!$command) {
                 return false;
             }
 
-            while ($this->getLexicKey() !== 'end') {
+            while ($this->getLexicalKey() !== 'end') {
                 $command = $this->command();
                 if (!$command) {
                     return false;
@@ -254,23 +254,23 @@ class Syntax
             }
         }
 
-        if ($this->getLexicKey() !== 'end') {
+        if ($this->getLexicalKey() !== 'end') {
             $this->setError('end');
             return false;
         }
         $this->print('end');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
-        if ($this->getLexicKey() !== ';') {
+        if ($this->getLexicalKey() !== ';') {
             $this->setError(';');
             return false;
         }
         $this->print(';');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
         echo htmlspecialchars("</Block>") . '<br>';
         return true;
@@ -281,14 +281,14 @@ class Syntax
         /** @noinspection HtmlDeprecatedTag */
         echo htmlspecialchars("<Command>") . '<br>';
 
-        if ($this->getLexicKey() === '{') {
+        if ($this->getLexicalKey() === '{') {
             $comment = $this->comment();
             if (!$comment) {
                 return false;
             }
         }
 
-        if ($this->getLexicKey() === 'id' | $this->getLexicKey() === 'begin' | $this->getLexicKey() === 'all') {
+        if ($this->getLexicalKey() === 'id' | $this->getLexicalKey() === 'begin' | $this->getLexicalKey() === 'all') {
             $basicCommand = $this->basicCommand();
             if (!$basicCommand) {
                 return false;
@@ -297,7 +297,7 @@ class Syntax
             return true;
         }
 
-        if ($this->getLexicKey() === 'while' | $this->getLexicKey() === 'repeat') {
+        if ($this->getLexicalKey() === 'while' | $this->getLexicalKey() === 'repeat') {
             $iteration = $this->iteration();
             if (!$iteration) {
                 return false;
@@ -305,57 +305,57 @@ class Syntax
             return true;
         }
 
-        if ($this->getLexicKey() !== 'if') {
+        if ($this->getLexicalKey() !== 'if') {
             $this->setError('if');
             return false;
         }
         $this->print('if');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
-        if ($this->getLexicKey() !== '(') {
+        if ($this->getLexicalKey() !== '(') {
             $this->setError('(');
             return false;
         }
         $this->print('(');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
         $relationalExpression = $this->relationalExpression();
         if (!$relationalExpression) {
             return false;
         }
 
-        if ($this->getLexicKey() !== ')') {
+        if ($this->getLexicalKey() !== ')') {
             $this->setError(')');
             return false;
         }
         $this->print(')');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
-        if ($this->getLexicKey() !== 'then') {
+        if ($this->getLexicalKey() !== 'then') {
             $this->setError('then');
             return false;
         }
         $this->print('then');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
         $command = $this->command();
         if (!$command) {
             return false;
         }
 
-        if ($this->getLexicKey() === 'else') {
+        if ($this->getLexicalKey() === 'else') {
             $this->print('else');
 
-            $this->lexicTable->next();
-            $this->lexicIndexTable->next();
+            $this->lexicalTable->next();
+            $this->lexicalIndexTable->next();
 
             $command = $this->command();
             if (!$command) {
@@ -372,14 +372,14 @@ class Syntax
     {
         echo htmlspecialchars("<Basic_Command>") . '<br>';
 
-        if ($this->getLexicKey() === '{') {
+        if ($this->getLexicalKey() === '{') {
             $comment = $this->comment();
             if (!$comment) {
                 return false;
             }
         }
 
-        if ($this->getLexicKey() === 'id') {
+        if ($this->getLexicalKey() === 'id') {
             $attribution = $this->attribution();
             if (!$attribution) {
                 return false;
@@ -387,7 +387,7 @@ class Syntax
             return true;
         }
 
-        if ($this->getLexicKey() === 'begin') {
+        if ($this->getLexicalKey() === 'begin') {
             $block = $this->block();
             if (!$block) {
                 return false;
@@ -395,72 +395,72 @@ class Syntax
             return true;
         }
 
-        if ($this->getLexicKey() !== 'all') {
+        if ($this->getLexicalKey() !== 'all') {
             $this->setError('all');
             return false;
         }
         $this->print('all');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
-        if ($this->getLexicKey() !== '(') {
+        if ($this->getLexicalKey() !== '(') {
             $this->setError('(');
             return false;
         }
         $this->print('(');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
-        if ($this->getLexicKey() !== 'id') {
+        if ($this->getLexicalKey() !== 'id') {
             $this->setError('id');
             return false;
         }
         $this->print('id');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
-        if ($this->getLexicKey() === ',') {
-            while ($this->getLexicKey() !== ')') {
-                if ($this->getLexicKey() !== ',') {
+        if ($this->getLexicalKey() === ',') {
+            while ($this->getLexicalKey() !== ')') {
+                if ($this->getLexicalKey() !== ',') {
                     $this->setError(',');
                     return false;
                 }
                 $this->print(',');
 
-                $this->lexicTable->next();
-                $this->lexicIndexTable->next();
+                $this->lexicalTable->next();
+                $this->lexicalIndexTable->next();
 
-                if ($this->getLexicKey() !== 'id') {
+                if ($this->getLexicalKey() !== 'id') {
                     $this->setError('id');
                     return false;
                 }
                 $this->print('id');
 
-                $this->lexicTable->next();
-                $this->lexicIndexTable->next();
+                $this->lexicalTable->next();
+                $this->lexicalIndexTable->next();
             }
         }
 
-        if ($this->getLexicKey() !== ')') {
+        if ($this->getLexicalKey() !== ')') {
             $this->setError(')');
             return false;
         }
         $this->print(')');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
-        if ($this->getLexicKey() !== ';') {
+        if ($this->getLexicalKey() !== ';') {
             $this->setError(';');
             return false;
         }
         $this->print(';');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
 
         echo htmlspecialchars("</Basic_Command>") . '<br>';
@@ -471,7 +471,7 @@ class Syntax
     {
         echo htmlspecialchars("<Attribution>") . '<br>';
 
-        if ($this->getLexicKey() === '{') {
+        if ($this->getLexicalKey() === '{') {
             $comment = $this->comment();
             if (!$comment) {
                 return false;
@@ -480,33 +480,33 @@ class Syntax
 
         $this->print('id');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
-        if ($this->getLexicKey() !== ':=') {
+        if ($this->getLexicalKey() !== ':=') {
             $this->setError(':=');
             return false;
         }
 
         $this->print(':=');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
         $arithmeticExpression = $this->arithmeticExpression();
         if (!$arithmeticExpression) {
             return false;
         }
 
-        if ($this->getLexicKey() !== ';') {
+        if ($this->getLexicalKey() !== ';') {
             $this->setError(';');
             return false;
         }
 
         $this->print(';');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
         echo htmlspecialchars("</Attribution>") . '<br>';
         return true;
@@ -516,71 +516,71 @@ class Syntax
     {
         echo htmlspecialchars("<Arithmetic_Expression>") . '<br>';
 
-        if ($this->getLexicKey() === '{') {
+        if ($this->getLexicalKey() === '{') {
             $comment = $this->comment();
             if (!$comment) {
                 return false;
             }
         }
 
-        if ($this->getLexicKey() === '(') {
+        if ($this->getLexicalKey() === '(') {
             $this->print('(');
 
-            $this->lexicTable->next();
-            $this->lexicIndexTable->next();
+            $this->lexicalTable->next();
+            $this->lexicalIndexTable->next();
 
             $arithmeticExpression = $this->arithmeticExpression();
             if (!$arithmeticExpression) {
                 return false;
             }
 
-            if ($this->getLexicKey() !== ')') {
+            if ($this->getLexicalKey() !== ')') {
                 $this->setError(')');
                 return false;
             }
 
             $this->print(')');
 
-            $this->lexicTable->next();
-            $this->lexicIndexTable->next();
+            $this->lexicalTable->next();
+            $this->lexicalIndexTable->next();
 
-            if ($this->getLexicKey() !== '+' |
-                $this->getLexicKey() !== '-' |
-                $this->getLexicKey() !== '*' |
-                $this->getLexicKey() !== '/') {
+            if ($this->getLexicalKey() !== '+' |
+                $this->getLexicalKey() !== '-' |
+                $this->getLexicalKey() !== '*' |
+                $this->getLexicalKey() !== '/') {
                 $this->setError('+ ou - ou * ou /');
                 return false;
             }
 
-            $this->print($this->getLexicKey());
+            $this->print($this->getLexicalKey());
 
-            $this->lexicTable->next();
-            $this->lexicIndexTable->next();
+            $this->lexicalTable->next();
+            $this->lexicalIndexTable->next();
 
-            if ($this->getLexicKey() !== '(') {
+            if ($this->getLexicalKey() !== '(') {
                 $this->setError('(');
                 return false;
             }
 
             $this->print('(');
 
-            $this->lexicTable->next();
-            $this->lexicIndexTable->next();
+            $this->lexicalTable->next();
+            $this->lexicalIndexTable->next();
 
             $arithmeticExpression = $this->arithmeticExpression();
             if (!$arithmeticExpression) {
                 return false;
             }
 
-            if ($this->getLexicKey() !== ')') {
+            if ($this->getLexicalKey() !== ')') {
                 $this->setError(')');
                 return false;
             }
 
             $this->print(')');
 
-            $this->lexicTable->next();
-            $this->lexicIndexTable->next();
+            $this->lexicalTable->next();
+            $this->lexicalIndexTable->next();
 
             return true;
         }
@@ -590,14 +590,14 @@ class Syntax
             return false;
         }
 
-        if ($this->getLexicKey() === '+' |
-            $this->getLexicKey() === '-' |
-            $this->getLexicKey() === '*' |
-            $this->getLexicKey() === '/') {
-            $this->print($this->getLexicKey());
+        if ($this->getLexicalKey() === '+' |
+            $this->getLexicalKey() === '-' |
+            $this->getLexicalKey() === '*' |
+            $this->getLexicalKey() === '/') {
+            $this->print($this->getLexicalKey());
 
-            $this->lexicTable->next();
-            $this->lexicIndexTable->next();
+            $this->lexicalTable->next();
+            $this->lexicalIndexTable->next();
 
             $value = $this->value();
             if (!$value) {
@@ -615,48 +615,48 @@ class Syntax
     {
         echo htmlspecialchars("<Comment>") . '<br>';
 
-        if ($this->getLexicKey() !== '{') {
+        if ($this->getLexicalKey() !== '{') {
             $this->setError('{');
             return false;
         }
         $this->print('{');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
-        if ($this->getLexicKey() !== "'") {
+        if ($this->getLexicalKey() !== "'") {
             $this->setError("'");
             return false;
         }
         $this->print("'");
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
-        while ($this->getLexicKey() !== "'") {
+        while ($this->getLexicalKey() !== "'") {
             $this->print("'");
 
-            $this->lexicTable->next();
-            $this->lexicIndexTable->next();
+            $this->lexicalTable->next();
+            $this->lexicalIndexTable->next();
         }
 
-        if ($this->getLexicKey() !== "'") {
+        if ($this->getLexicalKey() !== "'") {
             $this->setError("'");
             return false;
         }
         $this->print("'");
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
-        if ($this->getLexicKey() !== '}') {
+        if ($this->getLexicalKey() !== '}') {
             $this->setError('}');
             return false;
         }
         $this->print('}');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
         echo htmlspecialchars("</Comment>") . '<br>';
         return true;
@@ -666,21 +666,23 @@ class Syntax
     {
         echo htmlspecialchars("<Value>") . '<br>';
 
-        if ($this->getLexicKey() === '{') {
+        if ($this->getLexicalKey() === '{') {
             $comment = $this->comment();
             if (!$comment) {
                 return false;
             }
         }
 
-        if ($this->getLexicKey() !== "id" && $this->getLexicKey() !== "integer" && $this->getLexicKey() !== "real") {
+        if ($this->getLexicalKey() !== "id" &&
+            $this->getLexicalKey() !== "integer" &&
+            $this->getLexicalKey() !== "real") {
             $this->setError("id ou integer ou real");
             return false;
         }
-        $this->print($this->getLexicKey());
+        $this->print($this->getLexicalKey());
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
         echo htmlspecialchars("</Value>") . '<br>';
         return true;
@@ -690,109 +692,109 @@ class Syntax
     {
         echo htmlspecialchars("<Iteration>") . '<br>';
 
-        if ($this->getLexicKey() === '{') {
+        if ($this->getLexicalKey() === '{') {
             $comment = $this->comment();
             if (!$comment) {
                 return false;
             }
         }
 
-        if ($this->getLexicKey() === 'while') {
+        if ($this->getLexicalKey() === 'while') {
             $this->print('while');
-            $this->lexicTable->next();
-            $this->lexicIndexTable->next();
+            $this->lexicalTable->next();
+            $this->lexicalIndexTable->next();
 
-            if ($this->getLexicKey() !== '(') {
+            if ($this->getLexicalKey() !== '(') {
                 $this->setError('(');
                 return false;
             }
             $this->print('(');
-            $this->lexicTable->next();
-            $this->lexicIndexTable->next();
+            $this->lexicalTable->next();
+            $this->lexicalIndexTable->next();
 
             $relationalExpression = $this->relationalExpression();
             if (!$relationalExpression) {
                 return false;
             }
 
-            if ($this->getLexicKey() !== ')') {
+            if ($this->getLexicalKey() !== ')') {
                 $this->setError(')');
                 return false;
             }
             $this->print(')');
-            $this->lexicTable->next();
-            $this->lexicIndexTable->next();
+            $this->lexicalTable->next();
+            $this->lexicalIndexTable->next();
 
-            if ($this->getLexicKey() !== 'do') {
+            if ($this->getLexicalKey() !== 'do') {
                 $this->setError('do');
                 return false;
             }
             $this->print('do');
-            $this->lexicTable->next();
-            $this->lexicIndexTable->next();
+            $this->lexicalTable->next();
+            $this->lexicalIndexTable->next();
 
             return true;
         }
 
-        if ($this->getLexicKey() !== 'repeat') {
+        if ($this->getLexicalKey() !== 'repeat') {
             $this->setError('repeat');
             return false;
         }
 
         $this->print('repeat');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
         $command = $this->command();
         if (!$command) {
             return false;
         }
 
-        if ($this->getLexicKey() !== 'until') {
+        if ($this->getLexicalKey() !== 'until') {
             $this->setError('until');
             return false;
         }
 
         $this->print('until');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
-        if ($this->getLexicKey() !== '(') {
+        if ($this->getLexicalKey() !== '(') {
             $this->setError('(');
             return false;
         }
 
         $this->print('(');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
         $relationalExpression = $this->relationalExpression();
         if (!$relationalExpression) {
             return false;
         }
 
-        if ($this->getLexicKey() !== ')') {
+        if ($this->getLexicalKey() !== ')') {
             $this->setError(')');
             return false;
         }
 
         $this->print(')');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
-        if ($this->getLexicKey() !== ';') {
+        if ($this->getLexicalKey() !== ';') {
             $this->setError(';');
             return false;
         }
 
         $this->print(';');
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
         echo htmlspecialchars("</Iteration>") . '<br>';
         return true;
@@ -802,58 +804,58 @@ class Syntax
     {
         echo htmlspecialchars("<Relational_Expression>") . '<br>';
 
-        if ($this->getLexicKey() === '{') {
+        if ($this->getLexicalKey() === '{') {
             $comment = $this->comment();
             if (!$comment) {
                 return false;
             }
         }
 
-        if ($this->getLexicKey() === '(') {
+        if ($this->getLexicalKey() === '(') {
             $this->print('(');
 
-            $this->lexicTable->next();
-            $this->lexicIndexTable->next();
+            $this->lexicalTable->next();
+            $this->lexicalIndexTable->next();
 
             $relationalExpression = $this->relationalExpression();
             if (!$relationalExpression) {
                 return false;
             }
 
-            $this->lexicTable->next();
-            $this->lexicIndexTable->next();
+            $this->lexicalTable->next();
+            $this->lexicalIndexTable->next();
 
 
-            while ($this->getLexicKey() === 'and' | $this->getLexicKey() === 'or') {
-                $this->print($this->getLexicKey());
+            while ($this->getLexicalKey() === 'and' | $this->getLexicalKey() === 'or') {
+                $this->print($this->getLexicalKey());
 
-                $this->lexicTable->next();
-                $this->lexicIndexTable->next();
+                $this->lexicalTable->next();
+                $this->lexicalIndexTable->next();
 
-                if ($this->getLexicKey() !== '(') {
+                if ($this->getLexicalKey() !== '(') {
                     $this->setError('(');
                     return false;
                 }
 
                 $this->print('(');
 
-                $this->lexicTable->next();
-                $this->lexicIndexTable->next();
+                $this->lexicalTable->next();
+                $this->lexicalIndexTable->next();
 
                 $relationalExpression = $this->relationalExpression();
                 if (!$relationalExpression) {
                     return false;
                 }
 
-                if ($this->getLexicKey() !== ')') {
+                if ($this->getLexicalKey() !== ')') {
                     $this->setError(')');
                     return false;
                 }
 
                 $this->print(')');
 
-                $this->lexicTable->next();
-                $this->lexicIndexTable->next();
+                $this->lexicalTable->next();
+                $this->lexicalIndexTable->next();
             }
 
             return true;
@@ -864,20 +866,20 @@ class Syntax
             return false;
         }
 
-        if ($this->getLexicKey() !== '<=' &&
-            $this->getLexicKey() !== '>=' &&
-            $this->getLexicKey() !== '<>' &&
-            $this->getLexicKey() !== '=' &&
-            $this->getLexicKey() !== '<' &&
-            $this->getLexicKey() !== '>') {
+        if ($this->getLexicalKey() !== '<=' &&
+            $this->getLexicalKey() !== '>=' &&
+            $this->getLexicalKey() !== '<>' &&
+            $this->getLexicalKey() !== '=' &&
+            $this->getLexicalKey() !== '<' &&
+            $this->getLexicalKey() !== '>') {
             $this->setError('<= ou >= ou <> ou = ou < ou >');
             return false;
         }
 
-        $this->print($this->getLexicKey());
+        $this->print($this->getLexicalKey());
 
-        $this->lexicTable->next();
-        $this->lexicIndexTable->next();
+        $this->lexicalTable->next();
+        $this->lexicalIndexTable->next();
 
         $value = $this->value();
         if (!$value) {

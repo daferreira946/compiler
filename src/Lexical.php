@@ -4,13 +4,13 @@ namespace Compiler\src;
 
 use ArrayIterator;
 
-class Lexic
+class Lexical
 {
     private array $config;
     private array $parsed;
     private array $trimmed;
     private array $errorMessage;
-    private array $lexicTable;
+    private array $lexicalTable;
 
     public function __construct(array $config, string $file)
     {
@@ -75,38 +75,38 @@ class Lexic
         return $this->trimmed;
     }
 
-    public function getLexicTable(): array
+    public function getLexicalTable(): array
     {
-        return $this->lexicTable;
+        return $this->lexicalTable;
     }
 
-    public function getLexicIterator(): ArrayIterator
+    public function getLexicalIterator(): ArrayIterator
     {
-        $lexicTable = [];
+        $lexicalTable = [];
 
-        foreach ($this->lexicTable as $line => $lines) {
+        foreach ($this->lexicalTable as $line => $lines) {
             foreach ($lines as $column => $values) {
-                if (isset($this->lexicTable[$line][$column])) {
+                if (isset($this->lexicalTable[$line][$column])) {
                     foreach ($values as $key => $value) {
-                        $lexicTable[][$key] = $value;
+                        $lexicalTable[][$key] = $value;
                     }
                 }
             }
         }
 
-        return new ArrayIterator($lexicTable);
+        return new ArrayIterator($lexicalTable);
     }
 
-    public function getLexicIteratorIndex(): ArrayIterator
+    public function getLexicalIteratorIndex(): ArrayIterator
     {
-        $lexicIndexTable = [];
-        foreach ($this->lexicTable as $line => $lines) {
+        $lexicalIndexTable = [];
+        foreach ($this->lexicalTable as $line => $lines) {
             foreach ($lines as $column => $value) {
-                $lexicIndexTable[] = "Linha: [$line] Coluna: [$column]";
+                $lexicalIndexTable[] = "Linha: [$line] Coluna: [$column]";
             }
         }
 
-        return new ArrayIterator($lexicIndexTable);
+        return new ArrayIterator($lexicalIndexTable);
     }
 
     private function trimmed(): void
@@ -126,7 +126,7 @@ class Lexic
         }
     }
 
-    public function lexicAnalyzer(array $tokens)
+    public function lexicalAnalyzer(array $tokens)
     {
         foreach ($tokens as $line => $lines) {
             foreach ($lines as $column => $value) {
@@ -136,33 +136,33 @@ class Lexic
                 $bool = $this->bool($token);
                 $symbols = $this->symbols($token);
                 $variables = $this->variables($token);
-                $unknow = true;
+                $unknown = true;
                 if ($word !== false) {
-                    $this->lexicTable[$line][$column][$word] = $token;
+                    $this->lexicalTable[$line][$column][$word] = $token;
                     $bool = false;
                     $symbols = false;
                     $variables = false;
-                    $unknow = false;
+                    $unknown = false;
                 }
                 if ($bool !== false) {
-                    $this->lexicTable[$line][$column][$bool] = $token;
+                    $this->lexicalTable[$line][$column][$bool] = $token;
                     $symbols = false;
                     $variables = false;
-                    $unknow = false;
+                    $unknown = false;
                 }
                 if ($symbols !== false) {
-                    $this->lexicTable[$line][$column][$symbols] = $token;
+                    $this->lexicalTable[$line][$column][$symbols] = $token;
                     $variables = false;
-                    $unknow = false;
+                    $unknown = false;
                 }
                 if ($variables !== false) {
-                    $this->lexicTable[$line][$column][$variables] = $token;
-                    $unknow = false;
+                    $this->lexicalTable[$line][$column][$variables] = $token;
+                    $unknown = false;
                 }
                 if ($value === '') {
-                    $unknow = false;
+                    $unknown = false;
                 }
-                if ($unknow) {
+                if ($unknown) {
                     $this->errorMessage[] = "Erro léxico = $token não reconhecido, na linha $line coluna $column";
                 }
             }
