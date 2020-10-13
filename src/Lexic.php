@@ -28,23 +28,26 @@ class Lexic
         for ($line = 0; $line < count($this->trimmed); $line++) {
             $splitted = preg_split($pattern, strtolower($this->trimmed[$line]));
             for ($line2 = 0; $line2 < count($splitted); $line2++) {
-                if ($splitted[$line2] === ':') {
+                if (isset($splitted[$line2]) && $splitted[$line2] === ':') {
                     if ($splitted[$line2+1] === '=') {
                         $splitted[$line2] = $splitted[$line2] . $splitted[$line2+1];
                         unset($splitted[$line2+1]);
                     }
                 }
-                if ($splitted[$line2] === '>' | $splitted[$line2] === '<') {
+                if (isset($splitted[$line2]) && ($splitted[$line2] === '>' | $splitted[$line2] === '<')) {
                     if ($splitted[$line2+1] === '=') {
                         $splitted[$line2] = $splitted[$line2] . $splitted[$line2+1];
                         unset($splitted[$line2+1]);
                     }
                 }
-                if ($splitted[$line2] === '') {
+                if (isset($splitted[$line2]) &&
+                    ((string)$splitted[$line2] === '' |
+                        empty((string)$splitted[$line2]) |
+                        (string)$splitted[$line2] === "" |
+                        strlen($splitted[$line2]) === 0)) {
                     unset($splitted[$line2]);
                 }
             }
-
             $token[$line] = $splitted;
         }
 
@@ -122,14 +125,9 @@ class Lexic
 
     public function lexicAnalyzer(array $tokens)
     {
-        for ($line = 0; $line < count($tokens); $line++) {
-            for ($column = 0; $column < count($tokens[$line]); $column++) {
-                if (isset($tokens[$line][$column])) {
-                    if ($tokens[$line][$column] === '') {
-                        unset($tokens[$line][$column]);
-                    }
-                    $token = $tokens[$line][$column];
-                }
+        foreach ($tokens as $line => $lines) {
+            foreach ($lines as $column => $value) {
+                $token = $value;
 
                 $word = $this->word($token);
                 $bool = $this->bool($token);
@@ -158,6 +156,9 @@ class Lexic
                     $this->lexicTable[$line][$column][$variables] = $token;
                     $unknow = false;
                 }
+                if ($value === '') {
+                    $unknow = false;
+                }
                 if ($unknow) {
                     $this->errorMessage[] = "Erro léxico = $token não reconhecido, na linha $line coluna $column";
                 }
@@ -168,7 +169,7 @@ class Lexic
     private function word($token)
     {
         foreach ($this->config['words'] as $word) {
-            if ($token == $word) {
+            if ($token === $word) {
                 return $word;
             }
         }
@@ -179,7 +180,7 @@ class Lexic
     private function bool($token)
     {
         foreach ($this->config['booleans'] as $bool) {
-            if ($token == $bool) {
+            if ($token === $bool) {
                 return $bool;
             }
         }
@@ -191,7 +192,7 @@ class Lexic
     {
         foreach ($this->config['symbols'] as $symbols) {
             foreach ($symbols as $symbol) {
-                if ($token == $symbol) {
+                if ($token === $symbol) {
                     return $symbol;
                 }
             }

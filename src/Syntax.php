@@ -107,10 +107,10 @@ class Syntax
         $this->lexicTable->next();
         $this->lexicIndexTable->next();
 
-        //$block = $this->block();
-        //if (!$block) {
-        //    return false;
-        //}
+        $block = $this->block();
+        if (!$block) {
+            return false;
+        }
 
         if ($this->getLexicKey() !== 'end') {
             $this->setError('end');
@@ -158,6 +158,175 @@ class Syntax
 
             $this->lexicTable->next();
             $this->lexicIndexTable->next();
+        }
+
+        return true;
+    }
+
+    private function block()
+    {
+        if ($this->getLexicKey() !== 'begin') {
+            $this->setError('begin');
+            return false;
+        }
+
+        $this->print('begin');
+
+        $this->lexicTable->next();
+        $this->lexicIndexTable->next();
+
+        if ($this->getLexicKey() === 'id') {
+            $attribution = $this->attribution();
+            if (!$attribution) {
+                return false;
+            }
+        }
+
+        if ($this->getLexicKey() !== 'end') {
+            $this->setError('end');
+            return false;
+        }
+
+        $this->print('end');
+
+        $this->lexicTable->next();
+        $this->lexicIndexTable->next();
+
+        if ($this->getLexicKey() !== ';') {
+            $this->setError(';');
+            return false;
+        }
+
+        $this->print(';');
+
+        return true;
+    }
+
+    private function attribution()
+    {
+        $this->print('id');
+
+        $this->lexicTable->next();
+        $this->lexicIndexTable->next();
+        
+        if ($this->getLexicKey() !== ':=') {
+            $this->setError(':=');
+            return false;
+        }
+
+        $this->print(':=');
+
+        $this->lexicTable->next();
+        $this->lexicIndexTable->next();
+
+        $arithmeticExpression = $this->arithmeticExpression();
+        if (!$arithmeticExpression) {
+            return false;
+        }
+
+        if ($this->getLexicKey() !== ';') {
+            $this->setError(';');
+            return false;
+        }
+
+        $this->print(';');
+
+        $this->lexicTable->next();
+        $this->lexicIndexTable->next();
+    }
+
+    private function arithmeticExpression()
+    {
+        if ($this->getLexicKey() === '(') {
+            $this->print('(');
+
+            $this->lexicTable->next();
+            $this->lexicIndexTable->next();
+
+            $arithmeticExpression = $this->arithmeticExpression();
+            if (!$arithmeticExpression) {
+                return false;
+            }
+
+            if ($this->getLexicKey() !== ')') {
+                $this->setError(')');
+                return false;
+            }
+
+            $this->print(')');
+
+            $this->lexicTable->next();
+            $this->lexicIndexTable->next();
+            
+            if ($this->getLexicKey() !== '+' |
+                $this->getLexicKey() !== '-' |
+                $this->getLexicKey() !== '*' |
+                $this->getLexicKey() !== '/') {
+                $this->setError('+ ou - ou * ou /');
+                return false;
+            }
+
+            $this->print($this->getLexicKey());
+
+            $this->lexicTable->next();
+            $this->lexicIndexTable->next();
+
+            if ($this->getLexicKey() !== '(') {
+                $this->setError('(');
+                return false;
+            }
+
+            $this->print('(');
+
+            $this->lexicTable->next();
+            $this->lexicIndexTable->next();
+
+            $arithmeticExpression = $this->arithmeticExpression();
+            if (!$arithmeticExpression) {
+                return false;
+            }
+
+            if ($this->getLexicKey() !== ')') {
+                $this->setError(')');
+                return false;
+            }
+
+            $this->print(')');
+
+            $this->lexicTable->next();
+            $this->lexicIndexTable->next();
+
+            return true;
+        }
+
+        if ($this->getLexicKey() !== 'id' | $this->getLexicKey() !== 'integer' | $this->getLexicKey() !== 'real') {
+            $this->setError('id ou integer ou real');
+            return false;
+        }
+
+        $this->print($this->getLexicKey());
+
+        $this->lexicTable->next();
+        $this->lexicIndexTable->next();
+
+        if ($this->getLexicKey() === '+' |
+            $this->getLexicKey() === '-' |
+            $this->getLexicKey() === '*' |
+            $this->getLexicKey() === '/') {
+            $this->print($this->getLexicKey());
+
+            $this->lexicTable->next();
+            $this->lexicIndexTable->next();
+
+            if ($this->getLexicKey() !== 'id' | $this->getLexicKey() !== 'integer' | $this->getLexicKey() !== 'real') {
+                $this->setError('id ou integer ou real');
+                return false;
+            }
+            $this->print($this->getLexicKey());
+
+            $this->lexicTable->next();
+            $this->lexicIndexTable->next();
+            return true;
         }
 
         return true;
