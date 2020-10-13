@@ -9,8 +9,8 @@ class Lexical
     private array $config;
     private array $parsed;
     private array $trimmed;
-    private array $errorMessage;
     private array $lexicalTable;
+    private array $tokens;
 
     public function __construct(string $file)
     {
@@ -46,7 +46,7 @@ class Lexical
     /**
      * @return false|array
      */
-    public function getTokenCode()
+    private function getTokenCode()
     {
         $pattern = '/ /';
         for ($line = 0; $line < count($this->trimmed); $line++) {
@@ -88,79 +88,123 @@ class Lexical
             }
 
 
-            $token[$line] = $splitted;
+            $tokens[$line] = $splitted;
         }
 
         //Checando se está vazio
-        if (empty($token)) {
+        if (empty($tokens)) {
+            return false;
+        }
+        $this->tokens = $tokens;
+        return true;
+    }
+
+    private function lexicalAnalyzer(): bool
+    {
+        $getSuccess = $this->getTokenCode();
+        if ($getSuccess === false) {
+            echo "Sem tokens ";
             return false;
         }
 
-        return $token;
-    }
+        $tokens = $this->tokens;
 
-    /**
-     * @return false|array
-     */
-    public function getErrors()
-    {
-        if (!isset($this->errorMessage)) {
-            return false;
-        }
-        return $this->errorMessage;
-    }
-
-    public function getContent(): array
-    {
-        return $this->trimmed;
-    }
-
-    public function lexicalAnalyzer(array $tokens)
-    {
+        $comment = false;
         foreach ($tokens as $line => $lineContent) {
             foreach ($lineContent as $column => $value) {
-                $token = $value;
+                if ($value === '{') {
+                    $comment = true;
+                }
 
-                $word = $this->word($token);
-                $bool = $this->bool($token);
-                $symbols = $this->symbols($token);
-                $variables = $this->variables($token);
+                if ($value === '}') {
+                    $comment = false;
+                }
+
+                $word = $this->word($value);
+                $bool = $this->bool($value);
+                $symbols = $this->symbols($value);
+                $variables = $this->variables($value);
                 $unknown = true;
+
+                if ($comment === true) {
+                    $word = false;
+                    $bool = false;
+                    $symbols = false;
+                    $variables = false;
+                    $unknown = false;
+                }
+
                 if ($word !== false) {
-                    $this->lexicalTable[$line][$column][$word] = $token;
+                    $this->lexicalTable[$line][$column][$word] = $value;
                     $bool = false;
                     $symbols = false;
                     $variables = false;
                     $unknown = false;
                 }
                 if ($bool !== false) {
-                    $this->lexicalTable[$line][$column][$bool] = $token;
+                    $this->lexicalTable[$line][$column][$bool] = $value;
                     $symbols = false;
                     $variables = false;
                     $unknown = false;
                 }
                 if ($symbols !== false) {
-                    $this->lexicalTable[$line][$column][$symbols] = $token;
+                    $this->lexicalTable[$line][$column][$symbols] = $value;
                     $variables = false;
                     $unknown = false;
                 }
                 if ($variables !== false) {
-                    $this->lexicalTable[$line][$column][$variables] = $token;
+                    $this->lexicalTable[$line][$column][$variables] = $value;
                     $unknown = false;
                 }
                 if ($value === '') {
                     $unknown = false;
                 }
                 if ($unknown) {
-                    $this->errorMessage[] = "Erro léxico = $token não reconhecido, na linha $line coluna $column";
+                    echo "Erro léxico = $value não reconhecido, na linha $line coluna $column";
+                    return false;
                 }
             }
         }
+        return true;
     }
 
-    public function getLexicalTable(): array
+    /**
+     * @return false|array
+     */
+    private function getLexicalTable()
     {
+        $lexicalAnalyzer = $this->lexicalAnalyzer();
+        if ($lexicalAnalyzer === false) {
+            return false;
+        }
         return $this->lexicalTable;
+    }
+
+    public function printLexicTable()
+    {
+        $lexicalTable = $this->getLexicalTable();
+        if ($lexicalTable === false) {
+            return false;
+        }
+
+        echo "<table style='border: black solid;padding: 10px'>";
+        echo "<h1>Tabela Léxica</h1>";
+        foreach ($lexicalTable as $line => $lines) {
+            foreach ($lines as $column => $values) {
+                foreach ($values as $token => $value) {
+                    echo "<tr style='border: black solid;padding: 10px'>";
+                    echo "<td style='border: black solid;padding: 10px'>";
+                    echo "Position $line : $column";
+                    echo "</td>";
+                    echo "<td style='border: black solid;padding: 10px'>";
+                    echo " |$token| => |$value|";
+                    echo "</td>";
+                    echo "</tr>";
+                }
+            }
+        }
+        echo "</table>";
+        return true;
     }
 
     public function getLexicalIterator(): ArrayIterator
