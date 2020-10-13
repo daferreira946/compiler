@@ -59,23 +59,9 @@ class Syntax
     {
         echo htmlspecialchars("<Program>") . '<br>';
 
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
-        }
-
         $mainBlock = $this->mainBlock();
         if (!$mainBlock) {
             return false;
-        }
-
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
         }
 
         echo htmlspecialchars("</Program>") . '<br>';
@@ -86,13 +72,6 @@ class Syntax
     private function mainBlock(): bool
     {
         echo htmlspecialchars("<Main_Block>") . '<br>';
-
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
-        }
 
         if ($this->getLexicalKey() !== 'program') {
             $this->setError('program');
@@ -208,13 +187,6 @@ class Syntax
     {
         echo htmlspecialchars("<Block>") . '<br>';
 
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
-        }
-
         if ($this->getLexicalKey() !== 'begin') {
             $this->setError('begin');
             return false;
@@ -261,13 +233,6 @@ class Syntax
 
         $this->lexicalTable->next();
         $this->lexicalIndexTable->next();
-
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
-        }
 
         echo htmlspecialchars("</Block>") . '<br>';
         return true;
@@ -575,57 +540,6 @@ class Syntax
         }
 
         echo htmlspecialchars("</Arithmetic_Expression>") . '<br>';
-        return true;
-    }
-
-    private function comment(): bool
-    {
-        echo htmlspecialchars("<Comment>") . '<br>';
-
-        if ($this->getLexicalKey() !== '{') {
-            $this->setError('{');
-            return false;
-        }
-        $this->print('{');
-
-        $this->lexicalTable->next();
-        $this->lexicalIndexTable->next();
-
-        if ($this->getLexicalKey() !== "'") {
-            $this->setError("'");
-            return false;
-        }
-        $this->print("'");
-
-        $this->lexicalTable->next();
-        $this->lexicalIndexTable->next();
-
-        while ($this->getLexicalKey() !== "'") {
-            $this->print($this->getLexicalKey());
-
-            $this->lexicalTable->next();
-            $this->lexicalIndexTable->next();
-        }
-
-        if ($this->getLexicalKey() !== "'") {
-            $this->setError("'");
-            return false;
-        }
-        $this->print("'");
-
-        $this->lexicalTable->next();
-        $this->lexicalIndexTable->next();
-
-        if ($this->getLexicalKey() !== '}') {
-            $this->setError('}');
-            return false;
-        }
-        $this->print('}');
-
-        $this->lexicalTable->next();
-        $this->lexicalIndexTable->next();
-
-        echo htmlspecialchars("</Comment>") . '<br>';
         return true;
     }
 
