@@ -17,7 +17,7 @@ class Syntax
         $this->lexicIndexTable = $lexicIndexTable;
     }
 
-    public function syntaxAnalyser()
+    public function syntaxAnalyser(): bool
     {
         if (!$this->program()) {
             echo "<pre>";
@@ -29,28 +29,28 @@ class Syntax
         return true;
     }
 
-    private function getError()
+    private function getError(): string
     {
         return $this->error;
     }
 
-    private function setError(string $expected)
+    private function setError(string $expected): void
     {
         $this->error = 'Erro sintático: esperado ' . $expected . ', encontrado ' . $this->getLexicKey()
         . '. ' . $this->lexicIndexTable->current();
     }
 
-    private function getLexicKey()
+    private function getLexicKey(): string
     {
         return key($this->lexicTable->current());
     }
 
-    private function getLexicValue()
+    private function getLexicValue(): string
     {
         return $this->lexicTable->current()[$this->getLexicKey()];
     }
 
-    private function print(string $expected)
+    private function print(string $expected): void
     {
         print $expected;
         print " => ";
@@ -60,10 +60,7 @@ class Syntax
         print "<br>";
     }
 
-    /**
-     * @return false|mixed
-     */
-    private function program()
+    private function program(): bool
     {
         echo htmlspecialchars("<Program>") . '<br>';
 
@@ -84,7 +81,7 @@ class Syntax
         return true;
     }
 
-    private function mainBlock()
+    private function mainBlock(): bool
     {
         echo htmlspecialchars("<Main_Block>") . '<br>';
 
@@ -176,7 +173,7 @@ class Syntax
         return true;
     }
 
-    private function variableDeclaration()
+    private function variableDeclaration(): bool
     {
         echo htmlspecialchars("<Variable_Declaration>") . '<br>';
 
@@ -217,7 +214,7 @@ class Syntax
         return true;
     }
 
-    private function block()
+    private function block(): bool
     {
         echo htmlspecialchars("<Block>") . '<br>';
 
@@ -279,7 +276,7 @@ class Syntax
         return true;
     }
 
-    private function command()
+    private function command(): bool
     {
         /** @noinspection HtmlDeprecatedTag */
         echo htmlspecialchars("<Command>") . '<br>';
@@ -371,7 +368,7 @@ class Syntax
         return true;
     }
 
-    private function basicCommand()
+    private function basicCommand(): bool
     {
         echo htmlspecialchars("<Basic_Command>") . '<br>';
 
@@ -470,7 +467,7 @@ class Syntax
         return true;
     }
 
-    private function attribution()
+    private function attribution(): bool
     {
         echo htmlspecialchars("<Attribution>") . '<br>';
 
@@ -515,7 +512,7 @@ class Syntax
         return true;
     }
 
-    private function arithmeticExpression()
+    private function arithmeticExpression(): bool
     {
         echo htmlspecialchars("<Arithmetic_Expression>") . '<br>';
 
@@ -614,7 +611,7 @@ class Syntax
         return true;
     }
 
-    private function comment()
+    private function comment(): bool
     {
         echo htmlspecialchars("<Comment>") . '<br>';
 
@@ -665,7 +662,7 @@ class Syntax
         return true;
     }
 
-    private function value()
+    private function value(): bool
     {
         echo htmlspecialchars("<Value>") . '<br>';
 
@@ -689,7 +686,7 @@ class Syntax
         return true;
     }
 
-    private function iteration()
+    private function iteration(): bool
     {
         echo htmlspecialchars("<Iteration>") . '<br>';
 
@@ -801,7 +798,7 @@ class Syntax
         return true;
     }
 
-    private function relationalExpression()
+    private function relationalExpression(): bool
     {
         echo htmlspecialchars("<Relational_Expression>") . '<br>';
 
