@@ -19,17 +19,12 @@ class Syntax
 
     public function syntaxAnalyser(): bool
     {
-        if (!$this->program()) {
-            echo $this->getError() . "<br>";
+        $program = $this->program();
+        if (!$program) {
+            echo $this->error . "<br>";
             return false;
         }
-
         return true;
-    }
-
-    private function getError(): string
-    {
-        return $this->error;
     }
 
     private function setError(string $expected): void
@@ -40,11 +35,13 @@ class Syntax
 
     private function getLexicalKey(): string
     {
+        //Pegando chave da array atual do iterator
         return key($this->lexicalTable->current());
     }
 
     private function getLexicalValue(): string
     {
+        //Pegando o valor atual do iterator
         return $this->lexicalTable->current()[$this->getLexicalKey()];
     }
 
@@ -180,6 +177,7 @@ class Syntax
             $this->getLexicalKey() === 'real' |
             $this->getLexicalKey() === 'string') {
             $this->print($this->getLexicalKey());
+
             while ($this->getLexicalKey() !== ';') {
                 $this->lexicalTable->next();
                 $this->lexicalIndexTable->next();
@@ -200,7 +198,6 @@ class Syntax
 
             $this->lexicalTable->next();
             $this->lexicalIndexTable->next();
-
         }
 
         echo htmlspecialchars("</Variable_Declaration>") . '<br>';
@@ -232,7 +229,7 @@ class Syntax
             $this->getLexicalKey() === 'all' |
             $this->getLexicalKey() === 'while' |
             $this->getLexicalKey() === 'repeat' |
-            $this->getLexicalKey() !== 'if'
+            $this->getLexicalKey() === 'if'
         ) {
             $command = $this->command();
             if (!$command) {
@@ -286,7 +283,6 @@ class Syntax
             if (!$basicCommand) {
                 return false;
             }
-
             return true;
         }
 
@@ -605,7 +601,7 @@ class Syntax
         $this->lexicalIndexTable->next();
 
         while ($this->getLexicalKey() !== "'") {
-            $this->print("'");
+            $this->print($this->getLexicalKey());
 
             $this->lexicalTable->next();
             $this->lexicalIndexTable->next();
@@ -694,7 +690,7 @@ class Syntax
         }
 
         if ($this->getLexicalKey() !== 'repeat') {
-            $this->setError('repeat');
+            $this->setError('while ou repeat');
             return false;
         }
 
@@ -775,6 +771,15 @@ class Syntax
             $this->lexicalTable->next();
             $this->lexicalIndexTable->next();
 
+            if ($this->getLexicalKey() !== ')') {
+                $this->setError(')');
+                return false;
+            }
+
+            $this->print(')');
+
+            $this->lexicalTable->next();
+            $this->lexicalIndexTable->next();
 
             while ($this->getLexicalKey() === 'and' | $this->getLexicalKey() === 'or') {
                 $this->print($this->getLexicalKey());
