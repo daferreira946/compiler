@@ -1,7 +1,5 @@
 <?php
 
-
-use Compiler\src\Decoder;
 use Compiler\src\Lexical;
 use Compiler\src\Syntax;
 
@@ -10,13 +8,10 @@ require '../vendor/autoload.php';
 $openPre = "<pre>";
 $closePre = "</pre>";
 
-$decoder = new Decoder();
-$config = $decoder->getConfig();
-
 $file = '../uploads/algoritmo.txt';
 
-$lexical = new Lexical($config, $file);
-$parsed = $lexical->getContent();
+$lexical = new Lexical($file);
+$content = $lexical->getContent();
 $token = $lexical->getTokenCode();
 
 if ($token === false) {

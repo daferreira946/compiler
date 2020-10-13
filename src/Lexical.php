@@ -12,11 +12,35 @@ class Lexical
     private array $errorMessage;
     private array $lexicalTable;
 
-    public function __construct(array $config, string $file)
+    public function __construct(string $file)
     {
-        $this->config = $config;
+        $json = file_get_contents("../config.json");
+        $this->config = json_decode($json, true);
         $this->parsed = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        $this->trimmed();
+        $this->trimming();
+    }
+
+    private function trimming(): void
+    {
+        foreach ($this->parsed as $toTrim) {
+            //Tirando chars vazios, enters, tabs e etc
+            $trimmed = trim($toTrim, " \t\n\r\0\x0B");
+            //Adicionando espaços entre os símbolos para ajudar a separar os chars
+            foreach ($this->config['symbols'] as $symbols) {
+                foreach ($symbols as $symbol) {
+                    $replaceItem = " $symbol ";
+                    //Checando se o símbolo está no array aparado
+                    if (strpos($trimmed, $symbol) !== false) {
+                        //Substituindo o símbolo pelo o " símbolo "
+                        $trimmed = str_replace($symbol, $replaceItem, $trimmed);
+                    }
+                }
+            }
+            //Aqui eu retiro os espaços adicionados
+            $trimmed = str_replace('  ', ' ', $trimmed);
+            //Aqui eu passo o elemento aparado para o array
+            $this->trimmed[] = $trimmed;
+        }
     }
 
     /**
@@ -26,36 +50,53 @@ class Lexical
     {
         $pattern = '/ /';
         for ($line = 0; $line < count($this->trimmed); $line++) {
-            $splitted = preg_split($pattern, strtolower($this->trimmed[$line]));
+            //Deixando tudo minúsculo
+            $lowerLine = strtolower($this->trimmed[$line]);
+            //Explodindo a string de acordo com o padrão
+            $splitted = preg_split($pattern, $lowerLine);
+            //Varrer a array resultante da explosão
             for ($line2 = 0; $line2 < count($splitted); $line2++) {
+                //Checando se a posição está settada e se é igual a :
                 if (isset($splitted[$line2]) && $splitted[$line2] === ':') {
+                    //Checando se o próximo é igual a =
                     if ($splitted[$line2+1] === '=') {
+                        //Concatenando em :=
                         $splitted[$line2] = $splitted[$line2] . $splitted[$line2+1];
+                        //Tirando o próximo index
                         unset($splitted[$line2+1]);
                     }
                 }
+                //Checando se a posição tá settada e se é igual a > ou <
                 if (isset($splitted[$line2]) && ($splitted[$line2] === '>' | $splitted[$line2] === '<')) {
+                    //Checando se o próximo é igual a =
                     if ($splitted[$line2+1] === '=') {
+                        //Concatenando em <= ou >=
                         $splitted[$line2] = $splitted[$line2] . $splitted[$line2+1];
+                        //Tirando o próximo index
                         unset($splitted[$line2+1]);
                     }
                 }
+                //Checando se a posição ta settada e se é string vazia
                 if (isset($splitted[$line2]) &&
                     ((string)$splitted[$line2] === '' |
                         empty((string)$splitted[$line2]) |
                         (string)$splitted[$line2] === "" |
                         strlen($splitted[$line2]) === 0)) {
+                    //Tirando a posição que contém string vazia
                     unset($splitted[$line2]);
                 }
             }
+
+
             $token[$line] = $splitted;
         }
 
-        if (!empty($token)) {
-            return $token;
+        //Checando se está vazio
+        if (empty($token)) {
+            return false;
         }
 
-        return false;
+        return $token;
     }
 
     /**
@@ -63,11 +104,10 @@ class Lexical
      */
     public function getErrors()
     {
-        if (isset($this->errorMessage)) {
-            return $this->errorMessage;
+        if (!isset($this->errorMessage)) {
+            return false;
         }
-
-        return false;
+        return $this->errorMessage;
     }
 
     public function getContent(): array
@@ -75,61 +115,10 @@ class Lexical
         return $this->trimmed;
     }
 
-    public function getLexicalTable(): array
-    {
-        return $this->lexicalTable;
-    }
-
-    public function getLexicalIterator(): ArrayIterator
-    {
-        $lexicalTable = [];
-
-        foreach ($this->lexicalTable as $line => $lines) {
-            foreach ($lines as $column => $values) {
-                if (isset($this->lexicalTable[$line][$column])) {
-                    foreach ($values as $key => $value) {
-                        $lexicalTable[][$key] = $value;
-                    }
-                }
-            }
-        }
-
-        return new ArrayIterator($lexicalTable);
-    }
-
-    public function getLexicalIteratorIndex(): ArrayIterator
-    {
-        $lexicalIndexTable = [];
-        foreach ($this->lexicalTable as $line => $lines) {
-            foreach ($lines as $column => $value) {
-                $lexicalIndexTable[] = "Linha: [$line] Coluna: [$column]";
-            }
-        }
-
-        return new ArrayIterator($lexicalIndexTable);
-    }
-
-    private function trimmed(): void
-    {
-        foreach ($this->parsed as $toTrim) {
-            $trimmed = trim($toTrim, " \t\n\r\0\x0B");
-            foreach ($this->config['symbols'] as $symbols) {
-                foreach ($symbols as $symbol) {
-                    $replaceItem = " $symbol ";
-                    if (strpos($trimmed, $symbol) !== false) {
-                        $trimmed = str_replace($symbol, $replaceItem, $trimmed);
-                    }
-                }
-            }
-            $trimmed = str_replace('  ', ' ', $trimmed);
-            $this->trimmed[] = $trimmed;
-        }
-    }
-
     public function lexicalAnalyzer(array $tokens)
     {
-        foreach ($tokens as $line => $lines) {
-            foreach ($lines as $column => $value) {
+        foreach ($tokens as $line => $lineContent) {
+            foreach ($lineContent as $column => $value) {
                 $token = $value;
 
                 $word = $this->word($token);
@@ -167,6 +156,41 @@ class Lexical
                 }
             }
         }
+    }
+
+    public function getLexicalTable(): array
+    {
+        return $this->lexicalTable;
+    }
+
+    public function getLexicalIterator(): ArrayIterator
+    {
+        $lexicalTable = [];
+
+        foreach ($this->lexicalTable as $line => $lineContent) {
+            foreach ($lineContent as $column => $values) {
+                //Checando se o index está settado
+                if (isset($this->lexicalTable[$line][$column])) {
+                    foreach ($values as $token => $value) {
+                        $lexicalTable[][$token] = $value;
+                    }
+                }
+            }
+        }
+
+        return new ArrayIterator($lexicalTable);
+    }
+
+    public function getLexicalIteratorIndex(): ArrayIterator
+    {
+        $lexicalIndexTable = [];
+        foreach ($this->lexicalTable as $line => $lineContent) {
+            foreach ($lineContent as $column) {
+                $lexicalIndexTable[] = "Linha: [$line] Coluna: [$column]";
+            }
+        }
+
+        return new ArrayIterator($lexicalIndexTable);
     }
 
     /**
