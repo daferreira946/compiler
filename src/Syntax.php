@@ -161,9 +161,6 @@ class Syntax
         $this->lexicIndexTable->next();
 
         if ($this->lexicTable->valid() !== false) {
-            $this->lexicTable->next();
-            $this->lexicIndexTable->next();
-
             if ($this->getLexicKey() !== '{') {
                 $this->setError('{');
                 return false;

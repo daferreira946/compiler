@@ -9,3 +9,4 @@ Program teste;
 					All(l1) ;
 		end;
 	end.
+	{'uiuiuiuiuiu'}
