@@ -20,10 +20,8 @@ class Syntax
     public function syntaxAnalyser(): bool
     {
         if (!$this->program()) {
-            echo "<pre>";
-            var_dump($this->getError());
-            echo "</pre>";
-            return $this->getError();
+            echo $this->getError() . "<br>";
+            return false;
         }
 
         return true;
@@ -76,6 +74,13 @@ class Syntax
             return false;
         }
 
+        if ($this->getLexicalKey() === '{') {
+            $comment = $this->comment();
+            if (!$comment) {
+                return false;
+            }
+        }
+
         echo htmlspecialchars("</Program>") . '<br>';
 
         return true;
@@ -119,9 +124,13 @@ class Syntax
         $this->lexicalTable->next();
         $this->lexicalIndexTable->next();
 
-        $variableDeclaration = $this->variableDeclaration();
-        if (!$variableDeclaration) {
-            return false;
+        if ($this->getLexicalKey() === 'integer' |
+            $this->getLexicalKey() === 'real' |
+            $this->getLexicalKey() === 'string') {
+            $variableDeclaration = $this->variableDeclaration();
+            if (!$variableDeclaration) {
+                return false;
+            }
         }
 
         if ($this->getLexicalKey() !== 'begin') {
@@ -154,19 +163,9 @@ class Syntax
         }
         $this->print('.');
 
-        $this->lexicalTable->next();
-        $this->lexicalIndexTable->next();
-
         if ($this->lexicalTable->valid() !== false) {
-            if ($this->getLexicalKey() !== '{') {
-                $this->setError('{');
-                return false;
-            }
-
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
+            $this->lexicalTable->next();
+            $this->lexicalIndexTable->next();
         }
 
         echo htmlspecialchars("</Main_Block>") . '<br>';
@@ -176,13 +175,6 @@ class Syntax
     private function variableDeclaration(): bool
     {
         echo htmlspecialchars("<Variable_Declaration>") . '<br>';
-
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
-        }
 
         while ($this->getLexicalKey() === 'integer' |
             $this->getLexicalKey() === 'real' |
@@ -208,13 +200,7 @@ class Syntax
 
             $this->lexicalTable->next();
             $this->lexicalIndexTable->next();
-        }
 
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
         }
 
         echo htmlspecialchars("</Variable_Declaration>") . '<br>';
@@ -295,13 +281,6 @@ class Syntax
         /** @noinspection HtmlDeprecatedTag */
         echo htmlspecialchars("<Command>") . '<br>';
 
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
-        }
-
         if ($this->getLexicalKey() === 'id' | $this->getLexicalKey() === 'begin' | $this->getLexicalKey() === 'all') {
             $basicCommand = $this->basicCommand();
             if (!$basicCommand) {
@@ -378,13 +357,6 @@ class Syntax
             return true;
         }
 
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
-        }
-
         echo htmlspecialchars("</Command>") . '<br>';
         return true;
     }
@@ -392,13 +364,6 @@ class Syntax
     private function basicCommand(): bool
     {
         echo htmlspecialchars("<Basic_Command>") . '<br>';
-
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
-        }
 
         if ($this->getLexicalKey() === 'id') {
             $attribution = $this->attribution();
@@ -483,13 +448,6 @@ class Syntax
         $this->lexicalTable->next();
         $this->lexicalIndexTable->next();
 
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
-        }
-
         echo htmlspecialchars("</Basic_Command>") . '<br>';
         return true;
     }
@@ -497,13 +455,6 @@ class Syntax
     private function attribution(): bool
     {
         echo htmlspecialchars("<Attribution>") . '<br>';
-
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
-        }
 
         $this->print('id');
 
@@ -535,13 +486,6 @@ class Syntax
         $this->lexicalTable->next();
         $this->lexicalIndexTable->next();
 
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
-        }
-
         echo htmlspecialchars("</Attribution>") . '<br>';
         return true;
     }
@@ -549,13 +493,6 @@ class Syntax
     private function arithmeticExpression(): bool
     {
         echo htmlspecialchars("<Arithmetic_Expression>") . '<br>';
-
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
-        }
 
         if ($this->getLexicalKey() === '(') {
             $this->print('(');
@@ -641,13 +578,6 @@ class Syntax
             return true;
         }
 
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
-        }
-
         echo htmlspecialchars("</Arithmetic_Expression>") . '<br>';
         return true;
     }
@@ -707,13 +637,6 @@ class Syntax
     {
         echo htmlspecialchars("<Value>") . '<br>';
 
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
-        }
-
         if ($this->getLexicalKey() !== "id" &&
             $this->getLexicalKey() !== "integer" &&
             $this->getLexicalKey() !== "real") {
@@ -725,13 +648,6 @@ class Syntax
         $this->lexicalTable->next();
         $this->lexicalIndexTable->next();
 
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
-        }
-
         echo htmlspecialchars("</Value>") . '<br>';
         return true;
     }
@@ -739,13 +655,6 @@ class Syntax
     private function iteration(): bool
     {
         echo htmlspecialchars("<Iteration>") . '<br>';
-
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
-        }
 
         if ($this->getLexicalKey() === 'while') {
             $this->print('while');
@@ -844,13 +753,6 @@ class Syntax
         $this->lexicalTable->next();
         $this->lexicalIndexTable->next();
 
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
-        }
-
         echo htmlspecialchars("</Iteration>") . '<br>';
         return true;
     }
@@ -858,13 +760,6 @@ class Syntax
     private function relationalExpression(): bool
     {
         echo htmlspecialchars("<Relational_Expression>") . '<br>';
-
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
-        }
 
         if ($this->getLexicalKey() === '(') {
             $this->print('(');
@@ -939,13 +834,6 @@ class Syntax
         $value = $this->value();
         if (!$value) {
             return false;
-        }
-
-        if ($this->getLexicalKey() === '{') {
-            $comment = $this->comment();
-            if (!$comment) {
-                return false;
-            }
         }
 
         echo htmlspecialchars("</Relational_Expression>") . '<br>';
