@@ -768,9 +768,6 @@ class Syntax
                 return false;
             }
 
-            $this->lexicalTable->next();
-            $this->lexicalIndexTable->next();
-
             if ($this->getLexicalKey() !== ')') {
                 $this->setError(')');
                 return false;
