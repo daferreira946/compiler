@@ -3,9 +3,6 @@
 namespace Compiler\src;
 
 use ArrayIterator;
-use ArrayObject;
-
-require '../vendor/autoload.php';
 
 class Lexic
 {
@@ -22,6 +19,9 @@ class Lexic
         $this->trimmed();
     }
 
+    /**
+     * @return false|array
+     */
     public function getTokenCode()
     {
         $pattern = '/ /';
@@ -58,6 +58,9 @@ class Lexic
         return false;
     }
 
+    /**
+     * @return false|array
+     */
     public function getErrors()
     {
         if (isset($this->errorMessage)) {
@@ -166,6 +169,10 @@ class Lexic
         }
     }
 
+    /**
+     * @param $token
+     * @return false|string
+     */
     private function word($token)
     {
         foreach ($this->config['words'] as $word) {
@@ -177,6 +184,10 @@ class Lexic
         return false;
     }
 
+    /**
+     * @param $token
+     * @return false|string
+     */
     private function bool($token)
     {
         foreach ($this->config['booleans'] as $bool) {
@@ -188,6 +199,10 @@ class Lexic
         return false;
     }
 
+    /**
+     * @param $token
+     * @return false|string
+     */
     private function symbols($token)
     {
         foreach ($this->config['symbols'] as $symbols) {
@@ -201,6 +216,10 @@ class Lexic
         return false;
     }
 
+    /**
+     * @param $token
+     * @return false|string
+     */
     private function variables($token)
     {
         if (preg_match($this->config['variables']['id'], $token)) {
