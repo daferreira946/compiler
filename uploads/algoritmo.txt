@@ -2,7 +2,6 @@ Program teste;
 	Integer x,y,zz1;
 	real i1,i2;
 	String l1;
-	
 	Begin
 		Begin
 			i1 := i2 + 10;

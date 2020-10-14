@@ -18,7 +18,7 @@ class Compile
 
     private function lexicalAnalyzer()
     {
-        $lexicalAnalyzer = $this->lexical->printLexicTable();
+        $lexicalAnalyzer = $this->lexical->printLexicalTable();
         if ($lexicalAnalyzer === false) {
             echo "Erro no léxico, <a href='../index.php'>clique aqui</a>  para voltar <br>";
             die();

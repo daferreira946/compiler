@@ -31,8 +31,13 @@ class Syntax
 
     private function setError(string $expected): void
     {
-        $this->error = 'Erro sintático: esperado ' . $expected . ', encontrado ' . $this->getLexicalKey()
-        . '. ' . $this->lexicalIndexTable->current();
+        $key = $this->lexicalIndexTable->key();
+        $this->lexicalIndexTable->seek($key-1);
+        $this->error = 'Erro sintático: esperado [' . $expected . '], encontrado [' . $this->getLexicalKey()
+        . ']. Logo após o elemento na: ' . $this->lexicalIndexTable->current();
+        $this->lexicalIndexTable->next();
+        echo $this->lexicalTable->key() . " ";
+        echo $this->lexicalIndexTable->key() . "<br>";
     }
 
     private function getLexicalKey(): string

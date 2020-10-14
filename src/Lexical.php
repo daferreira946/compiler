@@ -9,20 +9,23 @@ class Lexical
     private array $config;
     private array $parsed;
     private array $trimmed;
-    private array $lexicalTable;
     private array $tokens;
+    private array $lexicalTable;
+    private array $lexicalIndexTable;
+    private string $error;
 
     public function __construct(string $file)
     {
         $json = file_get_contents("../config.json");
         $this->config = json_decode($json, true);
-        $this->parsed = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $this->parsed = file($file);
         $this->trimming();
     }
 
     private function trimming(): void
     {
-        foreach ($this->parsed as $toTrim) {
+        $parsed = $this->parsed;
+        foreach ($parsed as $toTrim) {
             //Tirando chars vazios, enters, tabs e etc
             $trimmed = trim($toTrim, " \t\n\r\0\x0B");
             //Adicionando espaços entre os símbolos para ajudar a separar os chars
@@ -131,6 +134,8 @@ class Lexical
 
                 if ($word !== false) {
                     $this->lexicalTable[$line][$column][$word] = $value;
+                    $this->lexicalIndexTable[] = "Linha: ".($line+1)." Coluna: ".
+                        (strpos($this->parsed[$line], $value)+1) . ".<br>";
                     $bool = false;
                     $symbols = false;
                     $variables = false;
@@ -138,24 +143,27 @@ class Lexical
                 }
                 if ($bool !== false) {
                     $this->lexicalTable[$line][$column][$bool] = $value;
+                    $this->setLexicalIndexTable($line, $value);
                     $symbols = false;
                     $variables = false;
                     $unknown = false;
                 }
                 if ($symbols !== false) {
                     $this->lexicalTable[$line][$column][$symbols] = $value;
+                    $this->setLexicalIndexTable($line, $value);
                     $variables = false;
                     $unknown = false;
                 }
                 if ($variables !== false) {
                     $this->lexicalTable[$line][$column][$variables] = $value;
+                    $this->setLexicalIndexTable($line, $value);
                     $unknown = false;
                 }
                 if ($value === '') {
                     $unknown = false;
                 }
                 if ($unknown) {
-                    echo "Erro léxico = $value não reconhecido, na linha $line coluna $column";
+                    $this->setError($value);
                     return false;
                 }
 
@@ -176,13 +184,22 @@ class Lexical
         if ($lexicalAnalyzer === false) {
             return false;
         }
+
         return $this->lexicalTable;
     }
 
-    public function printLexicTable()
+    private function setLexicalIndexTable(int $line, string $value): void
+    {
+        $column = strpos($this->parsed[$line], $value)+1;
+        $line = $line + 1;
+        $this->lexicalIndexTable[] = "Linha: $line Coluna: $column.<br>";
+    }
+
+    public function printLexicalTable()
     {
         $lexicalTable = $this->getLexicalTable();
         if ($lexicalTable === false) {
+            echo $this->error;
             return false;
         }
 
@@ -226,14 +243,7 @@ class Lexical
 
     public function getLexicalIteratorIndex(): ArrayIterator
     {
-        $lexicalIndexTable = [];
-        foreach ($this->lexicalTable as $line => $lineContent) {
-            foreach ($lineContent as $column => $value) {
-                $lexicalIndexTable[] = "Linha: [$line] Coluna: [$column]";
-            }
-        }
-
-        return new ArrayIterator($lexicalIndexTable);
+        return new ArrayIterator($this->lexicalIndexTable);
     }
 
     /**
@@ -303,5 +313,21 @@ class Lexical
         }
 
         return false;
+    }
+
+    private function setError(string $unknownChar)
+    {
+        foreach ($this->parsed as $line => $value) {
+            $value = strtolower($value);
+            $column = strpos($value, $unknownChar);
+            if ($column !== false) {
+                $column++;
+                $line++;
+                $position = "Linha: [$line] Coluna: [$column]";
+            }
+        }
+        if (!empty($position)) {
+            $this->error = "Erro léxico = $unknownChar não reconhecido. " . $position . "<br>";
+        }
     }
 }
