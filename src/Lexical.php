@@ -87,7 +87,6 @@ class Lexical
                 }
             }
 
-
             $tokens[$line] = $splitted;
         }
 
@@ -114,10 +113,6 @@ class Lexical
             foreach ($lineContent as $column => $value) {
                 if ($value === '{') {
                     $comment = true;
-                }
-
-                if ($value === '}') {
-                    $comment = false;
                 }
 
                 $word = $this->word($value);
@@ -162,6 +157,10 @@ class Lexical
                 if ($unknown) {
                     echo "Erro léxico = $value não reconhecido, na linha $line coluna $column";
                     return false;
+                }
+
+                if ($value === '}') {
+                    $comment = false;
                 }
             }
         }
@@ -229,7 +228,7 @@ class Lexical
     {
         $lexicalIndexTable = [];
         foreach ($this->lexicalTable as $line => $lineContent) {
-            foreach ($lineContent as $column) {
+            foreach ($lineContent as $column => $value) {
                 $lexicalIndexTable[] = "Linha: [$line] Coluna: [$column]";
             }
         }
