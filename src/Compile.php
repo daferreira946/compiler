@@ -29,10 +29,8 @@ class Compile
     {
         $syntaxAnalyzer = $this->syntax->syntaxAnalyser();
         if ($syntaxAnalyzer === false) {
-            echo "Erro no sintático, <a href='../index.php'>clique aqui</a>  para voltar <br>";
+            echo "Erro no sintático ou semântico, <a href='../index.php'>clique aqui</a>  para voltar <br>";
             die();
         }
     }
-
-
 }

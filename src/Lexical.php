@@ -79,6 +79,17 @@ class Lexical
                         unset($splitted[$line2+1]);
                     }
                 }
+                //Checando se a posição está settada e se é igual a .
+                if (isset($splitted[$line2]) && $splitted[$line2] === '.') {
+                    //Checando se o anterior é diferente a "end"
+                    if ($splitted[$line2-1] !== 'end') {
+                        //Concatenando em N1.N2
+                        $splitted[$line2] = $splitted[$line2-1] . $splitted[$line2] . $splitted[$line2+1];
+                        //Tirando o próximo index
+                        unset($splitted[$line2+1]);
+                        unset($splitted[$line2-1]);
+                    }
+                }
                 //Checando se a posição ta settada e se é string vazia
                 if (isset($splitted[$line2]) &&
                     ((string)$splitted[$line2] === '' |
@@ -192,7 +203,7 @@ class Lexical
     {
         $column = strpos($this->parsed[$line], $value)+1;
         $line = $line + 1;
-        $this->lexicalIndexTable[] = "Linha: $line Coluna: $column.<br>";
+        $this->lexicalIndexTable[] = "Linha: $line Coluna: $column.";
     }
 
     public function printLexicalTable()
@@ -302,15 +313,15 @@ class Lexical
         if (preg_match($this->config['variables']['id'], $token)) {
             return 'id';
         }
-        
+
+        if (preg_match($this->config['variables']['real'], $token)) {
+            return 'real';
+        }
+
         if (preg_match($this->config['variables']['integer'], $token)) {
             return 'integer';
         }
 
-        str_replace('.', $this->config['variables']['real'], '\.');
-        if (preg_match($this->config['variables']['real'], $token)) {
-            return 'real';
-        }
 
         return false;
     }
@@ -327,7 +338,7 @@ class Lexical
             }
         }
         if (!empty($position)) {
-            $this->error = "Erro léxico = $unknownChar não reconhecido. " . $position . "<br>";
+            $this->error = "Erro 01, tipo léxico = $unknownChar não reconhecido. " . $position . "<br>";
         }
     }
 }

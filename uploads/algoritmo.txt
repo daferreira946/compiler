@@ -1,10 +1,11 @@
 Program teste;
-	Integer x,y,zz1;
-	real i1,i2;
+	Integer x,y,zz1,i1;
+	real i2;
 	String l1;
+	
 	Begin
 		Begin
-			i1 := i2 + 10;
+			i1 := 10 * 8.5;
 			if((x>=20) and (y<10)) then
 					All(l1) ;
 		end;

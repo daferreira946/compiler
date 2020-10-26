@@ -4,17 +4,22 @@
 namespace Compiler\src;
 
 use ArrayIterator;
+use ArrayObject;
 
 class Syntax
 {
+    private Semantic $semantic;
     private string $error;
     private ArrayIterator $lexicalTable;
     private ArrayIterator $lexicalIndexTable;
+    private ArrayObject $expression;
 
     public function __construct(ArrayIterator $lexicalTable, ArrayIterator $lexicalIndexTable)
     {
         $this->lexicalTable = $lexicalTable;
         $this->lexicalIndexTable = $lexicalIndexTable;
+        $this->semantic = new Semantic();
+        $this->expression =  new ArrayObject();
     }
 
     public function syntaxAnalyser(): bool
@@ -22,8 +27,11 @@ class Syntax
         echo "<h1>Análise sintática</h1>";
 
         $program = $this->program();
-        if (!$program) {
-            echo $this->error . "<br>";
+        if ($program === false) {
+            if (!empty($this->error)) {
+                echo $this->error . "<br>";
+                return false;
+            }
             return false;
         }
         return true;
@@ -33,11 +41,9 @@ class Syntax
     {
         $key = $this->lexicalIndexTable->key();
         $this->lexicalIndexTable->seek($key-1);
-        $this->error = 'Erro sintático: esperado [' . $expected . '], encontrado [' . $this->getLexicalKey()
+        $this->error = 'Erro 02, tipo sintático: esperado [' . $expected . '], encontrado [' . $this->getLexicalKey()
         . ']. Logo após o elemento na: ' . $this->lexicalIndexTable->current();
         $this->lexicalIndexTable->next();
-        echo $this->lexicalTable->key() . " ";
-        echo $this->lexicalIndexTable->key() . "<br>";
     }
 
     private function getLexicalKey(): string
@@ -67,7 +73,7 @@ class Syntax
         echo htmlspecialchars("<Program>") . '<br>';
 
         $mainBlock = $this->mainBlock();
-        if (!$mainBlock) {
+        if ($mainBlock === false) {
             return false;
         }
 
@@ -86,6 +92,8 @@ class Syntax
         }
         $this->print('program');
 
+        $type = $this->getLexicalKey();
+
         $this->lexicalTable->next();
         $this->lexicalIndexTable->next();
 
@@ -94,6 +102,14 @@ class Syntax
             return false;
         }
         $this->print('id');
+
+        $id = $this->getLexicalValue();
+        $position = $this->lexicalIndexTable->current();
+
+        $setVariable = $this->semantic->setVariable($type, $id, $position);
+        if ($setVariable === false) {
+            return false;
+        }
 
         $this->lexicalTable->next();
         $this->lexicalIndexTable->next();
@@ -111,7 +127,7 @@ class Syntax
             $this->getLexicalKey() === 'real' |
             $this->getLexicalKey() === 'string') {
             $variableDeclaration = $this->variableDeclaration();
-            if (!$variableDeclaration) {
+            if ($variableDeclaration === false) {
                 return false;
             }
         }
@@ -126,7 +142,7 @@ class Syntax
         $this->lexicalIndexTable->next();
 
         $block = $this->block();
-        if (!$block) {
+        if ($block === false) {
             return false;
         }
 
@@ -163,6 +179,7 @@ class Syntax
             $this->getLexicalKey() === 'real' |
             $this->getLexicalKey() === 'string') {
             $this->print($this->getLexicalKey());
+            $type = $this->getLexicalKey();
 
             while ($this->getLexicalKey() !== ';') {
                 $this->lexicalTable->next();
@@ -172,6 +189,15 @@ class Syntax
                     return false;
                 }
                 $this->print('id');
+
+                $id = $this->getLexicalValue();
+                $position = $this->lexicalIndexTable->current();
+
+                $setVariable = $this->semantic->setVariable($type, $id, $position);
+
+                if ($setVariable === false) {
+                    return false;
+                }
 
                 $this->lexicalTable->next();
                 $this->lexicalIndexTable->next();
@@ -211,13 +237,13 @@ class Syntax
             $this->getLexicalKey() === 'if'
         ) {
             $command = $this->command();
-            if (!$command) {
+            if ($command === false) {
                 return false;
             }
 
             while ($this->getLexicalKey() !== 'end') {
                 $command = $this->command();
-                if (!$command) {
+                if ($command === false) {
                     return false;
                 }
             }
@@ -252,7 +278,7 @@ class Syntax
 
         if ($this->getLexicalKey() === 'id' | $this->getLexicalKey() === 'begin' | $this->getLexicalKey() === 'all') {
             $basicCommand = $this->basicCommand();
-            if (!$basicCommand) {
+            if ($basicCommand === false) {
                 return false;
             }
             return true;
@@ -260,7 +286,7 @@ class Syntax
 
         if ($this->getLexicalKey() === 'while' | $this->getLexicalKey() === 'repeat') {
             $iteration = $this->iteration();
-            if (!$iteration) {
+            if ($iteration === false) {
                 return false;
             }
             return true;
@@ -285,7 +311,7 @@ class Syntax
         $this->lexicalIndexTable->next();
 
         $relationalExpression = $this->relationalExpression();
-        if (!$relationalExpression) {
+        if ($relationalExpression === false) {
             return false;
         }
 
@@ -308,7 +334,7 @@ class Syntax
         $this->lexicalIndexTable->next();
 
         $command = $this->command();
-        if (!$command) {
+        if ($command === false) {
             return false;
         }
 
@@ -319,7 +345,7 @@ class Syntax
             $this->lexicalIndexTable->next();
 
             $command = $this->command();
-            if (!$command) {
+            if ($command === false) {
                 return false;
             }
             return true;
@@ -335,7 +361,7 @@ class Syntax
 
         if ($this->getLexicalKey() === 'id') {
             $attribution = $this->attribution();
-            if (!$attribution) {
+            if ($attribution === false) {
                 return false;
             }
             return true;
@@ -343,7 +369,7 @@ class Syntax
 
         if ($this->getLexicalKey() === 'begin') {
             $block = $this->block();
-            if (!$block) {
+            if ($block === false) {
                 return false;
             }
             return true;
@@ -371,6 +397,17 @@ class Syntax
             $this->setError('id');
             return false;
         }
+        $id = $this->getLexicalValue();
+        $position = $this->lexicalIndexTable->current();
+        $checkDeclared = $this->semantic->checkVariableSet($id, $position);
+        if ($checkDeclared === false) {
+            return false;
+        }
+        $checkType = $this->semantic->checkVariableType($id, "string", $position);
+        if ($checkType === false) {
+            return false;
+        }
+
         $this->print('id');
 
         $this->lexicalTable->next();
@@ -391,6 +428,17 @@ class Syntax
                     $this->setError('id');
                     return false;
                 }
+                $id = $this->getLexicalValue();
+                $position = $this->lexicalIndexTable->current();
+                $checkDeclared = $this->semantic->checkVariableSet($id, $position);
+                if ($checkDeclared === false) {
+                    return false;
+                }
+                $checkType = $this->semantic->checkVariableType($id, "string", $position);
+                if ($checkType === false) {
+                    return false;
+                }
+
                 $this->print('id');
 
                 $this->lexicalTable->next();
@@ -424,6 +472,19 @@ class Syntax
     {
         echo htmlspecialchars("<Attribution>") . '<br>';
 
+        $id = $this->getLexicalValue();
+        $position = $this->lexicalIndexTable->current();
+        $checkDeclared = $this->semantic->checkVariableSet($id, $position);
+        if ($checkDeclared === false) {
+            return false;
+        }
+        $checkNotStringType = $this->semantic->checkNotString($id, $position);
+        if ($checkNotStringType === false) {
+            return false;
+        }
+
+        $this->expression->append($id);
+
         $this->print('id');
 
         $this->lexicalTable->next();
@@ -434,13 +495,20 @@ class Syntax
             return false;
         }
 
+        $this->expression->append($this->getLexicalValue());
+
         $this->print(':=');
 
         $this->lexicalTable->next();
         $this->lexicalIndexTable->next();
 
         $arithmeticExpression = $this->arithmeticExpression();
-        if (!$arithmeticExpression) {
+        if ($arithmeticExpression === false) {
+            return false;
+        }
+
+        $checkExpression = $this->semantic->checkExpression($this->expression, $position);
+        if ($checkExpression === false) {
             return false;
         }
 
@@ -463,13 +531,14 @@ class Syntax
         echo htmlspecialchars("<Arithmetic_Expression>") . '<br>';
 
         if ($this->getLexicalKey() === '(') {
+            $this->expression->append($this->getLexicalValue());
             $this->print('(');
 
             $this->lexicalTable->next();
             $this->lexicalIndexTable->next();
 
             $arithmeticExpression = $this->arithmeticExpression();
-            if (!$arithmeticExpression) {
+            if ($arithmeticExpression === false) {
                 return false;
             }
 
@@ -477,7 +546,7 @@ class Syntax
                 $this->setError(')');
                 return false;
             }
-
+            $this->expression->append($this->getLexicalValue());
             $this->print(')');
 
             $this->lexicalTable->next();
@@ -491,6 +560,7 @@ class Syntax
                 return false;
             }
 
+            $this->expression->append($this->getLexicalValue());
             $this->print($this->getLexicalKey());
 
             $this->lexicalTable->next();
@@ -501,13 +571,14 @@ class Syntax
                 return false;
             }
 
+            $this->expression->append($this->getLexicalValue());
             $this->print('(');
 
             $this->lexicalTable->next();
             $this->lexicalIndexTable->next();
 
             $arithmeticExpression = $this->arithmeticExpression();
-            if (!$arithmeticExpression) {
+            if ($arithmeticExpression === false) {
                 return false;
             }
 
@@ -516,6 +587,7 @@ class Syntax
                 return false;
             }
 
+            $this->expression->append($this->getLexicalValue());
             $this->print(')');
 
             $this->lexicalTable->next();
@@ -525,7 +597,7 @@ class Syntax
         }
 
         $value = $this->value();
-        if (!$value) {
+        if ($value === false) {
             return false;
         }
 
@@ -533,16 +605,16 @@ class Syntax
             $this->getLexicalKey() === '-' |
             $this->getLexicalKey() === '*' |
             $this->getLexicalKey() === '/') {
+            $this->expression->append($this->getLexicalValue());
             $this->print($this->getLexicalKey());
 
             $this->lexicalTable->next();
             $this->lexicalIndexTable->next();
 
             $value = $this->value();
-            if (!$value) {
+            if ($value === false) {
                 return false;
             }
-
             return true;
         }
 
@@ -560,6 +632,21 @@ class Syntax
             $this->setError("id ou integer ou real");
             return false;
         }
+
+        if ($this->getLexicalKey() === "id") {
+            $id = $this->getLexicalValue();
+            $position = $this->lexicalIndexTable->current();
+            $checkDeclared = $this->semantic->checkVariableSet($id, $position);
+            if ($checkDeclared === false) {
+                return false;
+            }
+            $checkNotStringType = $this->semantic->checkNotString($id, $position);
+            if ($checkNotStringType === false) {
+                return false;
+            }
+        }
+
+        $this->expression->append($this->getLexicalValue());
         $this->print($this->getLexicalKey());
 
         $this->lexicalTable->next();
@@ -587,7 +674,7 @@ class Syntax
             $this->lexicalIndexTable->next();
 
             $relationalExpression = $this->relationalExpression();
-            if (!$relationalExpression) {
+            if ($relationalExpression === false) {
                 return false;
             }
 
@@ -621,7 +708,7 @@ class Syntax
         $this->lexicalIndexTable->next();
 
         $command = $this->command();
-        if (!$command) {
+        if ($command === false) {
             return false;
         }
 
@@ -646,7 +733,7 @@ class Syntax
         $this->lexicalIndexTable->next();
 
         $relationalExpression = $this->relationalExpression();
-        if (!$relationalExpression) {
+        if ($relationalExpression === false) {
             return false;
         }
 
@@ -685,7 +772,7 @@ class Syntax
             $this->lexicalIndexTable->next();
 
             $relationalExpression = $this->relationalExpression();
-            if (!$relationalExpression) {
+            if ($relationalExpression === false) {
                 return false;
             }
 
@@ -716,7 +803,7 @@ class Syntax
                 $this->lexicalIndexTable->next();
 
                 $relationalExpression = $this->relationalExpression();
-                if (!$relationalExpression) {
+                if ($relationalExpression === false) {
                     return false;
                 }
 
@@ -735,7 +822,7 @@ class Syntax
         }
 
         $value = $this->value();
-        if (!$value) {
+        if ($value === false) {
             return false;
         }
 
@@ -755,7 +842,7 @@ class Syntax
         $this->lexicalIndexTable->next();
 
         $value = $this->value();
-        if (!$value) {
+        if ($value === false) {
             return false;
         }
 
