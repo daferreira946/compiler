@@ -95,23 +95,29 @@ class Semantic
 
         //Concatenando toda a expressão
         while ($expressionIterator->valid()) {
-            $calc .= $expressionIterator->current();
-            $expressionIterator->next();
+            if ($this->alreadyDeclared($expressionIterator->current())) {
+                $calc .= $this->variables[$expressionIterator->current()]["value"];
+                $expressionIterator->next();
+            } else {
+                $calc .= $expressionIterator->current();
+                $expressionIterator->next();
+            }
         }
 
         //Concatenando com ; para encerrar expressão php
         $calc .= ";";
         //Resolvendo a expressão contida na string calc e passando para a variável received
-        $received = eval($calc);
+        $result = eval($calc);
 
         //Checa se o tipo da variável é integer e se o resultado da expressão é diferente de inteiro
         //Lançai o erro
-        if ($type === 'integer' && !is_integer($received)) {
+        if ($type === 'integer' && !is_integer($result)) {
             echo "Erro 3: Tipos Incompatíveis. [integer] e [real]. "
                 .$position. "<br>";
             return false;
         }
 
+        $this->variables[$received]["value"] = $result;
         return true;
     }
 }
