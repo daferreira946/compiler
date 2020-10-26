@@ -78,22 +78,34 @@ class Semantic
 
     public function checkExpression(ArrayObject $expression, string $position)
     {
+        //Pegando Iterator da expressão
         $expressionIterator = $expression->getIterator();
+        //Pegando a variável que vai receber o resultado da expressão
         $received = $expressionIterator->current();
+        //Pegando o tipo da variável que vai receber o resultado da expressão
         $type = $this->variables[$received]["type"];
+
         $expressionIterator->next();
         
-        //pular o símbolo de atribuição
+        //Pulando o símbolo de atribuição
         $expressionIterator->next();
+
+        //Iniciando a string de calc para retornar o valor
         $calc = "return ";
+
+        //Concatenando toda a expressão
         while ($expressionIterator->valid()) {
             $calc .= $expressionIterator->current();
             $expressionIterator->next();
         }
 
+        //Concatenando com ; para encerrar expressão php
         $calc .= ";";
+        //Resolvendo a expressão contida na string calc e passando para a variável received
         $received = eval($calc);
 
+        //Checa se o tipo da variável é integer e se o resultado da expressão é diferente de inteiro
+        //Lançai o erro
         if ($type === 'integer' && !is_integer($received)) {
             echo "Erro 3: Tipos Incompatíveis. [integer] e [real]. "
                 .$position. "<br>";
