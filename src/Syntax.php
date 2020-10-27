@@ -516,6 +516,8 @@ class Syntax
             return false;
         }
 
+        $this->expression = new ArrayObject();
+
         if ($this->getLexicalKey() !== ';') {
             $this->setError(';');
             return false;

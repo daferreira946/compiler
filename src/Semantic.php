@@ -106,11 +106,12 @@ class Semantic
 
         //Concatenando com ; para encerrar expressão php
         $calc .= ";";
+
         //Resolvendo a expressão contida na string calc e passando para a variável received
         $result = eval($calc);
 
         //Checa se o tipo da variável é integer e se o resultado da expressão é diferente de inteiro
-        //Lançai o erro
+        //Lança o erro
         if ($type === 'integer' && !is_integer($result)) {
             echo "Erro 3: Tipos Incompatíveis. [integer] e [real]. "
                 .$position. "<br>";
