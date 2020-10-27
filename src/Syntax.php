@@ -81,6 +81,12 @@ class Syntax
             return false;
         }
 
+        if ($this->lexicalTable->valid()) {
+            $this->error = "Erro 02, tipo sintático, econtrado "
+                .$this->getLexicalKey().  " pós [end.]: "
+                .$this->lexicalIndexTable->current();
+        }
+
         echo htmlspecialchars("</Program>") . '<br>';
 
         return true;
