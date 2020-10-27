@@ -1,14 +1,14 @@
-Program teste;
-Integer x,y,zz1;
-real i1,i2;
-String l1;
-	
+Program x;
+Integer teste,y,zz1;
+real i1,I2;
+String l1;	
 Begin
 	Begin
-		I2 := 1/2;
-		x := i2 + 10;
+		I2 := 1;
+		i1 := i2 + 10;
 		if((x>=20) and (y<10)) then
 				All(l1);
 	end;
 end.
 end.
+String z1;

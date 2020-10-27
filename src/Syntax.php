@@ -85,6 +85,7 @@ class Syntax
             $this->error = "Erro 02, tipo sintático, econtrado "
                 .$this->getLexicalKey().  " pós [end.]: "
                 .$this->lexicalIndexTable->current();
+            return false;
         }
 
         echo htmlspecialchars("</Program>") . '<br>';
