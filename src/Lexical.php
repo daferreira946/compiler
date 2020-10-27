@@ -145,8 +145,7 @@ class Lexical
 
                 if ($word !== false) {
                     $this->lexicalTable[$line][$column][$word] = $value;
-                    $this->lexicalIndexTable[] = "Linha: ".($line+1)." Coluna: ".
-                        (strpos($this->parsed[$line], $value)+1) . ".<br>";
+                    $this->setLexicalIndexTable($line, $value);
                     $bool = false;
                     $symbols = false;
                     $variables = false;
