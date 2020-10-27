@@ -7,12 +7,9 @@ use ArrayObject;
 class Semantic
 {
     private ArrayObject $variables;
-    private array $config;
 
     public function __construct()
     {
-        $decoder = new Decoder();
-        $this->config = $decoder->getConfig();
         $this->variables = new ArrayObject();
     }
 
