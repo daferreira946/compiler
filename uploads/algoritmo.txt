@@ -1,0 +1,11 @@
+Integer x,y,zz1,i1;
+	real i2;
+	String l1;
+	
+	Begin
+		Begin
+			i1 := 10 / 2;
+			if((x>=20) and (y<10)) then
+					All(l1) ;
+		end;
+	end.

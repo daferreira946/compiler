@@ -40,7 +40,11 @@ class Syntax
     private function setError(string $expected): void
     {
         $key = $this->lexicalIndexTable->key();
-        $this->lexicalIndexTable->seek($key-1);
+        if ($key <= 0) {
+            $this->lexicalIndexTable->seek($key);
+        } else {
+            $this->lexicalIndexTable->seek($key-1);
+        }
         $this->error = 'Erro 02, tipo sintático: esperado [' . $expected . '], encontrado [' . $this->getLexicalKey()
         . ']. Logo após o elemento na: ' . $this->lexicalIndexTable->current();
         $this->lexicalIndexTable->next();
